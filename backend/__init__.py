@@ -13,6 +13,6 @@ def create_app():
     )
     
     from . import osuStats
-    app.register_blueprint(osuStats.views)
+    app.register_blueprint(osuStats.views, url_prefix='/users')
 
     return app

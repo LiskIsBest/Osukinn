@@ -5,14 +5,15 @@ export default function App() {
 const [data, setData] = useState([{}])
   
 useEffect(() => {
-  fetch("/members").then(
+  const querystring = window.location.search;
+  fetch("/users"+querystring).then(
     res => res.json()
   ).then(
     data => {
       setData(data)
       console.log(data)
     }
-  )
+    )
 }, [])
 
   return (
