@@ -4,6 +4,14 @@
 Home
 {%endblock%}
 
-{%block content%}
-<p>Hello World</p>
+{%block firstUser%}
+<h1 class="text-center">{{ user1.username }}</h1>
+<img src="{{ user1.avatar_url }}" class="rounded mx-auto d-block" alt="" width="200px" height="200px">
+<p class="text-center">Mania rank: {{ user1.mania_rank }}</p>
+{%endblock%}
+
+{%block secondUser%}
+<h1 class="text-center">{{ user2.username }}</h1>
+<img src="{{ user2.avatar_url }}" class="rounded mx-auto d-block" alt="" width="200px" height="200px">
+<p class="text-center">Mania rank: {{ user2.mania_rank }}</p>
 {%endblock%}

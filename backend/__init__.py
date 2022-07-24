@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -11,8 +12,8 @@ def create_app():
         FLASK_ENV = os.environ.get('FLASK_ENV'),
         FLASK_APP = os.environ.get("FLASK_APP")
     )
-    
+    CORS(app)
     from . import osuStats
-    app.register_blueprint(osuStats.views, url_prefix='/users')
+    app.register_blueprint(osuStats.views)
 
     return app

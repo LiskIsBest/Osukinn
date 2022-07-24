@@ -1,9 +1,9 @@
-from flask import Blueprint, request
-from flask_cors import CORS
+from flask import Blueprint, render_template, request
+# from flask_cors import CORS
 # from . import statGetter
 
 views = Blueprint('osuStats', __name__)
-CORS(views)
+# CORS(views)
 
 from ossapi import *
 from dotenv import load_dotenv
@@ -36,7 +36,8 @@ class OsuUser:
             self.ctb_rank = self.api.user(username,mode="fruits").rankHistory.data[-1]
             
         self.avatar_url = self.api.user(username).avatar_url
-        self.osuJson = {"username": self.username, 
+        self.osuJson = {
+                "username": self.username, 
                 "std_rank": self.std_rank, 
                 "mania_rank": self.mania_rank,
                 "taiko_rank": self.taiko_rank,
@@ -45,7 +46,7 @@ class OsuUser:
                 }
     
 
-@views.route('/')
+@views.route('/users')
 def members():
     
     bothUsers = {
@@ -53,4 +54,4 @@ def members():
         "user2":OsuUser(request.args.get('username2')).osuJson,
         }
     
-    return bothUsers
+    return render_template("home.html",user1=bothUsers["user1"],user2=bothUsers["user2"])
