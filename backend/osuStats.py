@@ -1,10 +1,6 @@
 from flask import Blueprint, render_template, request
-from jinja2 import environment
-# from flask_cors import CORS
-# from . import statGetter
 
 views = Blueprint('osuStats', __name__)
-# CORS(views)
 
 from ossapi import *
 from dotenv import load_dotenv
