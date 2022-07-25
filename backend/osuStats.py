@@ -29,5 +29,4 @@ def members():
     user1=makeUser(api=osuApi,username=request.args.get('username1'))
     user2=makeUser(api=osuApi,username=request.args.get('username2'))
     
-    # return render_template("home.html",user1=user1,user2=user2)
     return render_template("base.html", userList=[user1,user2])
