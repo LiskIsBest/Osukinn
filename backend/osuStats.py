@@ -14,6 +14,10 @@ REDIRECT_URL = os.environ.get("REDIRECT_URL")
 osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
 
 def makeUser(api: object, username: str) -> dict:
+    try:
+        api.user(username).username
+    except ValueError:
+        username = "None"
     getRank = lambda mode, username: "No rank" if (api.user(username,mode=mode).rankHistory == None) else api.user(username,mode=mode).rankHistory.data[-1]
     return {"username": username, 
             "std_rank": getRank(username=username,mode="osu"), 
