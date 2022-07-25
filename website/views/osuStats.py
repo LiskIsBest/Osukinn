@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request
 
 views = Blueprint('osuStats', __name__)
 
+import datetime
+
 from ossapi import *
 from dotenv import load_dotenv
 import os
@@ -21,13 +23,15 @@ def makeUser(api: object, username: str) -> dict:
             api.user(username).username
         except ValueError:
             username = "None"
-    getRank = lambda mode, username: "No rank" if (api.user(username,mode=mode).rankHistory == None) else api.user(username,mode=mode).rankHistory.data[-1]
-    return {"username": username, 
+    getRank = lambda mode, username: 9_999_999_999 if (api.user(username,mode=mode).rankHistory == None) else api.user(username,mode=mode).rankHistory.data[-1]
+    return {"username": username,
+            "user_id": api.user(username).id, 
             "std_rank": getRank(username=username,mode="osu"), 
             "mania_rank": getRank(username=username,mode="mania"),
             "taiko_rank": getRank(username=username,mode="taiko"),
             "ctb_rank": getRank(username=username,mode="fruits"),
-            "avatar_url": api.user(username).avatar_url
+            "avatar_url": api.user(username).avatar_url,
+            "last_time_refreshed": datetime.datetime.now()
             }
 
 @views.route('/', methods=["GET","POST"])

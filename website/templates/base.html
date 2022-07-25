@@ -41,9 +41,13 @@
         <p class="text-center">Standard rank: {{ user.std_rank | commafy }}</p>
         <p class="text-center">Taiko rank: {{ user.taiko_rank | commafy }}</p>
         <p class="text-center">Ctb rank: {{ user.ctb_rank | commafy }}</p>
+        <p class="text-center">time queried: {{ user.last_time_refreshed }}</p>
       </div>
       {% endfor %}
       <div class="col-lg-3"></div>
+    </div>
+    <div class="col-12">
+      <h3 class="text-center">Work in progress</h3>
     </div>
   </body>
   <script

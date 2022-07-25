@@ -10,9 +10,6 @@ class ConfigClass(object):
     
     # MongoDB connection url
     MONGO_DB_URL = os.environ.get("MONGO_URI_SH")
-    MONGO_SETTINGS = {
-        'host':MONGO_DB_URL
-    }
     
     # Flask settings
     FLASK_ENV=os.environ.get("FLASK_ENV")
