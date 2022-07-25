@@ -14,6 +14,14 @@ def create_app():
     )
     CORS(app)
     from . import osuStats
+    
+    @app.template_filter('commafy')
+    def commafy(value):
+        if value == "No rank":
+            return "No rank"
+        else:
+            return format(int(value), ',d')
+    
     app.register_blueprint(osuStats.views)
 
     return app

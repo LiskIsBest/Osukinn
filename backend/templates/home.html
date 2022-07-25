@@ -8,10 +8,31 @@ Home
 <h1 class="text-center">{{ user1.username }}</h1>
 <img src="{{ user1.avatar_url }}" class="rounded mx-auto d-block" alt="" width="200px" height="200px">
 <p class="text-center">Mania rank: {{ user1.mania_rank }}</p>
+<p class="text-center">Standard rank: {{ user1.std_rank }}</p>
+<p class="text-center">Taiko rank: {{ user1.taiko_rank }}</p>
+<p class="text-center">Ctb rank: {{ user1.ctb_rank }}</p>
 {%endblock%}
 
 {%block secondUser%}
 <h1 class="text-center">{{ user2.username }}</h1>
 <img src="{{ user2.avatar_url }}" class="rounded mx-auto d-block" alt="" width="200px" height="200px">
 <p class="text-center">Mania rank: {{ user2.mania_rank }}</p>
+<p class="text-center">Standard rank: {{ user2.std_rank }}</p>
+<p class="text-center">Taiko rank: {{ user2.taiko_rank }}</p>
+<p class="text-center">Ctb rank: {{ user2.ctb_rank }}</p>
 {%endblock%}
+
+{# {% block firstUser %}
+
+{% for user in userList %}
+<div class="container-fluid row">
+    <h1 class="text-center">{{user.username}}</h1>
+    <img src="{{ user.avatar_url }}" class="rounded mx-auto d-block" alt="" width="200px" height="200px">
+    <p class="text-center">Mania rank: {{user.mania_rank}}</p>
+    <p class="text-center">Standard rank: {{user.std_rank}}</p>
+    <p class="text-center">Taiko rank: {{user.taiko_rank}}</p>
+    <p class="text-center">Ctb rank: {{user.ctb_rank}}</p>
+</div>
+{% endfor %}
+
+{% endblock %} #}
