@@ -18,7 +18,7 @@ def makeUser(api: object, username: str) -> dict:
         username = "None"
     else:
         try:
-            api.user(userZname).username
+            api.user(username).username
         except ValueError:
             username = "None"
     getRank = lambda mode, username: "No rank" if (api.user(username,mode=mode).rankHistory == None) else api.user(username,mode=mode).rankHistory.data[-1]
