@@ -22,11 +22,14 @@ class OsuUser:
         self.std_rank = 9999999
         if self.api.user(username,mode="osu").rankHistory != None:
             self.std_rank = self.api.user(username,mode="osu").rankHistory.data[-1]
-            
-        self.mania_rank = 9999999
-        if self.api.user(username,mode="mania").rankHistory != None:
-            self.mania_rank = self.api.user(username,mode="mania").rankHistory.data[-1]
-            
+        
+
+        # self.mania_rank = 9999999
+        # if self.api.user(username,mode="mania").rankHistory != None:
+        #     self.mania_rank = self.api.user(username,mode="mania").rankHistory.data[-1]
+
+        self.mania_rank = lambda rank : 9999999 if (self.api.user(username,mode="mania").rankHistory == None) else self.api.user(username,mode="mania").rankHistory.data[-1]
+
         self.taiko_rank = 9999999
         if self.api.user(username,mode="taiko").rankHistory != None:
             self.taiko_rank = self.api.user(username,mode="taiko").rankHistory.data[-1]
