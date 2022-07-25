@@ -1,5 +1,4 @@
-from json import load
-from backend import create_app
+from website import create_app
 from dotenv import load_dotenv
 import os
 load_dotenv()
