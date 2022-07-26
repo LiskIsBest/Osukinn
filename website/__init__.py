@@ -1,11 +1,12 @@
 from flask import Flask
 from .views import osuStats
+from .extenstions import mongo
 
-from .config import ConfigClass
-
-def create_app():
+def create_app(config_object="website.config"):
     app = Flask(__name__)
-    app.config.from_object(__name__+".ConfigClass")
+    app.config.from_object(config_object)
+
+    mongo.init_app(app)
 
     from .views import osuStats
     

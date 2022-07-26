@@ -1,5 +1,8 @@
 from flask import Blueprint, render_template, request
 
+from ..extenstions import mongo
+
+
 views = Blueprint('osuStats', __name__)
 
 import datetime
@@ -24,8 +27,8 @@ def makeUser(api: object, username: str) -> dict:
         except ValueError:
             username = "None"
     getRank = lambda mode, username: 9_999_999_999 if (api.user(username,mode=mode).rankHistory == None) else api.user(username,mode=mode).rankHistory.data[-1]
-    return {"username": username,
-            "user_id": api.user(username).id, 
+    return {"_id": api.user(username).id, 
+            "username": username,
             "std_rank": getRank(username=username,mode="osu"), 
             "mania_rank": getRank(username=username,mode="mania"),
             "taiko_rank": getRank(username=username,mode="taiko"),
@@ -36,8 +39,30 @@ def makeUser(api: object, username: str) -> dict:
 
 @views.route('/', methods=["GET","POST"])
 def members():
+    user_database = mongo.db.users
     
-    user1=makeUser(api=osuApi,username=request.args.get('username1'))
-    user2=makeUser(api=osuApi,username=request.args.get('username2'))
+    user1 = osuApi.user(request.args.get('username1')).id
+    user2 = osuApi.user(request.args.get('username2')).id
     
-    return render_template("base.html", userList=[user1,user2])
+    if user_database.find_one(user1) != None:
+        user1=user_database.find_one(user1)
+        user1["last_time_refreshed"] = datetime.datetime.now()
+    else:
+        user1=makeUser(api=osuApi,username=request.args.get('username1'))
+        
+    if user_database.find_one(user2) != None:
+        user2=user_database.find_one(user2)
+        user2["last_time_refreshed"] = datetime.datetime.now()
+    else:
+        user2=makeUser(api=osuApi,username=request.args.get('username2'))
+    
+    userList = [user1,user2]
+    
+    for user in userList:
+        if user_database.find_one(user["_id"]) == None:
+            user_database.insert_one(user)
+        else:
+            pass
+
+    
+    return render_template("base.html", userList=userList)
