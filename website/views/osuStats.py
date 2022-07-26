@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request
+from dataclasses import dataclass
+from flask import Blueprint, redirect, render_template, request, url_for
 
 from ..extenstions import mongo
 
@@ -41,16 +42,20 @@ def makeUser(api: object, username: str) -> dict:
 def members():
     user_database = mongo.db.users
     
-    user1 = makeUser(api=osuApi,username=request.args.get('username1'))
-    user2 = makeUser(api=osuApi,username=request.args.get('username2'))
+    user1 = osuApi.user(request.args.get('username1'))
+    user2 = osuApi.user(request.args.get('username2'))
     
-    if user_database.find_one(user1["_id"]) != None:
-        user1=user_database.find_one(user1["_id"])
+    if user_database.find_one(user1.id) != None:
+        user1=user_database.find_one(user1.id)
         user1["last_time_refreshed"] = datetime.datetime.now()
+    else:
+        user1 = makeUser(api=osuApi,username=request.args.get('username1'))
         
-    if user_database.find_one(user2["_id"]) != None:
-        user2=user_database.find_one(user2["_id"])
+    if user_database.find_one(user2.id) != None:
+        user2=user_database.find_one(user2.id)
         user2["last_time_refreshed"] = datetime.datetime.now()
+    else:
+        user2 = makeUser(api=osuApi,username=request.args.get('username2'))
     
     userList = [user1,user2]
     
@@ -62,3 +67,15 @@ def members():
 
     
     return render_template("base.html", userList=userList)
+
+@views.route('/update', methods=["GET","POST"])
+def update():
+    user_database = mongo.db.users
+    
+    user1 = osuApi.user(request.args.get('username1'))
+    user2 = osuApi.user(request.args.get('username2'))
+
+    user_database.update_one({"_id":user1.id},{ "$set" :makeUser(api=osuApi,username=request.args.get('username1'))})
+    user_database.update_one({"_id":user2.id},{ "$set" :makeUser(api=osuApi,username=request.args.get('username2'))})
+
+    return redirect(f"/?username1={user1.username}&username2={user2.username}")
