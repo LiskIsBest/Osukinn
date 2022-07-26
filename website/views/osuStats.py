@@ -47,13 +47,11 @@ def members():
     
     if user_database.find_one(user1.id) != None:
         user1=user_database.find_one(user1.id)
-        user1["last_time_refreshed"] = datetime.datetime.now()
     else:
         user1 = makeUser(api=osuApi,username=request.args.get('username1'))
         
     if user_database.find_one(user2.id) != None:
         user2=user_database.find_one(user2.id)
-        user2["last_time_refreshed"] = datetime.datetime.now()
     else:
         user2 = makeUser(api=osuApi,username=request.args.get('username2'))
     
