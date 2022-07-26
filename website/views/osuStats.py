@@ -41,20 +41,16 @@ def makeUser(api: object, username: str) -> dict:
 def members():
     user_database = mongo.db.users
     
-    user1 = osuApi.user(request.args.get('username1')).id
-    user2 = osuApi.user(request.args.get('username2')).id
+    user1 = makeUser(api=osuApi,username=request.args.get('username1'))
+    user2 = makeUser(api=osuApi,username=request.args.get('username2'))
     
-    if user_database.find_one(user1) != None:
-        user1=user_database.find_one(user1)
+    if user_database.find_one(user1["_id"]) != None:
+        user1=user_database.find_one(user1["_id"])
         user1["last_time_refreshed"] = datetime.datetime.now()
-    else:
-        user1=makeUser(api=osuApi,username=request.args.get('username1'))
         
-    if user_database.find_one(user2) != None:
-        user2=user_database.find_one(user2)
+    if user_database.find_one(user2["_id"]) != None:
+        user2=user_database.find_one(user2["_id"])
         user2["last_time_refreshed"] = datetime.datetime.now()
-    else:
-        user2=makeUser(api=osuApi,username=request.args.get('username2'))
     
     userList = [user1,user2]
     
