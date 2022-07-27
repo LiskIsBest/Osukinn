@@ -42,7 +42,7 @@ def makeUser(api: object, username: str) -> dict:
 def users():
     user_database = mongo.db.users
     
-    request_mode = "mania" if request.args.get("mode") == "None" else request.args.get("mode")
+    request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
     request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
     username_list = request_string.replace(" ","").split(',') if request.args.get("usernames") != None else ["None"]
     
