@@ -20,7 +20,7 @@
         <label for="usernames">Enter usernames (ex: username1, username2, etc..) </label> <br />
         <div class="d-inline-flex">
           <select name="mode">
-            <option value="mania" selected>Mania</option>
+            <option value="mania" >Mania</option>
             <option value="osu" >Standard</option>
             <option value="taiko">Taiko</option>
             <option value="fruits">Ctb</option>
@@ -61,7 +61,7 @@
           <p class="text-center">Taiko rank: {{ user.taiko_rank | commafy }}</p>
           <p class="text-center">Ctb rank: {{ user.ctb_rank | commafy }}</p>
         {% endif %}
-        <p class="text-center">Last quried: {{ user.last_time_refreshed }}</p>
+        <p class="text-center">Last queried: {{ user.last_time_refreshed }}</p>
       </div>
       {% endfor %}
     </div>
