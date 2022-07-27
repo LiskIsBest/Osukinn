@@ -53,7 +53,12 @@
           <p class="text-center">Standard rank: {{ user.std_rank | commafy }}</p>
         {% elif modeChoice == "taiko"%}
           <p class="text-center">Taiko rank: {{ user.taiko_rank | commafy }}</p>
+        {% elif modeChoice == "fruits" %}
+          <p class="text-center">Ctb rank: {{ user.ctb_rank | commafy }}</p>
         {% else %}
+          <p class="text-center">Mania rank: {{ user.mania_rank | commafy }}</p>
+          <p class="text-center">Standard rank: {{ user.std_rank | commafy }}</p>
+          <p class="text-center">Taiko rank: {{ user.taiko_rank | commafy }}</p>
           <p class="text-center">Ctb rank: {{ user.ctb_rank | commafy }}</p>
         {% endif %}
         <p class="text-center">Last quried: {{ user.last_time_refreshed }}</p>
