@@ -47,7 +47,7 @@ def users():
     username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
     def list_strip(value):
         return value.strip()
-    username_list=map(list_strip,username_list)
+    username_list=list(map(list_strip,username_list))
 
     userList = [osuApi.user(username).id for username in username_list]
     
@@ -69,7 +69,7 @@ def update():
     username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
     def list_strip(value):
         return value.strip()
-    username_list=map(list_strip,username_list)
+    username_list=list(map(list_strip,username_list))
     
     user_id_list = [osuApi.user(username_list[index]).id for index in range(len(username_list))]
 
