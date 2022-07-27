@@ -61,7 +61,7 @@
           <p class="text-center">Taiko rank: {{ user.taiko_rank | commafy }}</p>
           <p class="text-center">Ctb rank: {{ user.ctb_rank | commafy }}</p>
         {% endif %}
-        <p class="text-center">Last queried: {{ user.last_time_refreshed }}</p>
+        <p class="text-center">Last queried(utc-4): {{ user.last_time_refreshed }}</p>
       </div>
       {% endfor %}
     </div>
