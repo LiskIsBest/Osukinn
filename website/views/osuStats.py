@@ -1,4 +1,3 @@
-import enum
 from flask import Blueprint, redirect, render_template, request
 
 from ..extenstions import mongo
@@ -63,11 +62,8 @@ def update():
     user_database = mongo.db.users
     
     request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
-    print(request_mode)
     request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
-    print(request_string)
     username_list = request_string.replace(" ","").split(',') if request.args.get("usernames") != None else ["None"]
-    print(username_list)
     
     user_id_list = [osuApi.user(username_list[index]).id for index in range(len(username_list))]
 

@@ -10,12 +10,6 @@ def create_app(config_object="website.config"):
 
     from .views import osuStats
     
-    @app.context_processor
-    def modeGrabber():
-        mode = str(request.args.get("mode"))
-        print(mode)
-        return mode
-    
     @app.template_filter('commafy')
     def commafy(value):
         if value == 9_999_999_999:
