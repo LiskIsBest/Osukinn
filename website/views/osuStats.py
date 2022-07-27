@@ -35,7 +35,7 @@ def makeUser(api: object, username: str) -> dict:
             "taiko_rank": getRank(username=username,mode="taiko"),
             "ctb_rank": getRank(username=username,mode="fruits"),
             "avatar_url": api.user(username).avatar_url,
-            "last_time_refreshed": datetime.datetime.now()
+            "last_time_refreshed": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
 @views.route('/', methods=["GET","POST"])
