@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from .views import osuStats
 from .extenstions import mongo
 
@@ -9,6 +9,12 @@ def create_app(config_object="website.config"):
     mongo.init_app(app)
 
     from .views import osuStats
+    
+    @app.context_processor
+    def modeGrabber():
+        mode = str(request.args.get("mode"))
+        print(mode)
+        return mode
     
     @app.template_filter('commafy')
     def commafy(value):

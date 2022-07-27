@@ -1,8 +1,7 @@
-from dataclasses import dataclass
-from flask import Blueprint, redirect, render_template, request, url_for
+import enum
+from flask import Blueprint, redirect, render_template, request
 
 from ..extenstions import mongo
-
 
 views = Blueprint('osuStats', __name__)
 
@@ -18,6 +17,8 @@ CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 REDIRECT_URL = os.environ.get("REDIRECT_URL")
 
 osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
+
+
 
 def makeUser(api: object, username: str) -> dict:
     if username == "":
@@ -39,41 +40,38 @@ def makeUser(api: object, username: str) -> dict:
             }
 
 @views.route('/', methods=["GET","POST"])
-def members():
+def users():
     user_database = mongo.db.users
     
-    user1 = osuApi.user(request.args.get('username1'))
-    user2 = osuApi.user(request.args.get('username2'))
+    request_mode = "mania" if request.args.get("mode") == "None" else request.args.get("mode")
+    request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
+    username_list = request_string.replace(" ","").split(',') if request.args.get("usernames") != None else ["None"]
     
-    if user_database.find_one(user1.id) != None:
-        user1=user_database.find_one(user1.id)
-    else:
-        user1 = makeUser(api=osuApi,username=request.args.get('username1'))
-        
-    if user_database.find_one(user2.id) != None:
-        user2=user_database.find_one(user2.id)
-    else:
-        user2 = makeUser(api=osuApi,username=request.args.get('username2'))
+    userList = [osuApi.user(username).id for username in username_list]
     
-    userList = [user1,user2]
-    
-    for user in userList:
-        if user_database.find_one(user["_id"]) == None:
-            user_database.insert_one(user)
+    for index, user_id in enumerate(userList):
+        if user_database.find_one({"_id":user_id}) != None:
+            userList[index]=user_database.find_one({"_id":user_id})
         else:
-            pass
-
-    
-    return render_template("base.html", userList=userList)
+            userList[index]=makeUser(api=osuApi,username=osuApi.user(user_id).username)
+            user_database.insert_one(userList[index])
+  
+    return render_template("index.html", userList=userList, modeChoice=request_mode, userListStr=request_string)
 
 @views.route('/update', methods=["GET","POST"])
 def update():
     user_database = mongo.db.users
     
-    user1 = osuApi.user(request.args.get('username1'))
-    user2 = osuApi.user(request.args.get('username2'))
+    request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
+    print(request_mode)
+    request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
+    print(request_string)
+    username_list = request_string.replace(" ","").split(',') if request.args.get("usernames") != None else ["None"]
+    print(username_list)
+    
+    user_id_list = [osuApi.user(username_list[index]).id for index in range(len(username_list))]
 
-    user_database.update_one({"_id":user1.id},{ "$set" :makeUser(api=osuApi,username=request.args.get('username1'))})
-    user_database.update_one({"_id":user2.id},{ "$set" :makeUser(api=osuApi,username=request.args.get('username2'))})
+    for index, id in enumerate(user_id_list):
+        user_database.update_one({"_id":id},{ "$set" :makeUser(api=osuApi,username=username_list[index])})
 
-    return redirect(f"/?username1={user1.username}&username2={user2.username}")
+    return redirect(f"/?mode={request_mode}&usernames={request_string}")
