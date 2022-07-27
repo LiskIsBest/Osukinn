@@ -44,8 +44,11 @@ def users():
     
     request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
     request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
-    username_list = request_string.replace(" ","").split(',') if request.args.get("usernames") != None else ["None"]
-    
+    username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
+    def list_strip(value):
+        return value.strip()
+    map(list_strip,username_list)
+
     userList = [osuApi.user(username).id for username in username_list]
     
     for index, user_id in enumerate(userList):
