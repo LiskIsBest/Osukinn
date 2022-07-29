@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request
 
 from ..extenstions import mongo
 
-views = Blueprint('osuStats', __name__)
+main = Blueprint('osuStats', __name__)
 
 import datetime
 
@@ -38,7 +38,7 @@ def makeUser(api: object, username: str) -> dict:
             "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
             }
             
-@views.route('/', methods=["GET","POST"])
+@main.route('/', methods=["GET","POST"])
 def users():
     user_database = mongo.db.users
     
@@ -60,7 +60,7 @@ def users():
   
     return render_template("index.html", userList=userList, modeChoice=request_mode, userListStr=request_string)
 
-@views.route('/update', methods=["GET","POST"])
+@main.route('/update', methods=["GET","POST"])
 def update():
     user_database = mongo.db.users
     

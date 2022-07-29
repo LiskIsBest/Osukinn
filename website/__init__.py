@@ -1,5 +1,4 @@
-from flask import Flask, request
-from .views import osuStats
+from flask import Flask
 from .extenstions import mongo
 
 def create_app(config_object="website.config"):
@@ -8,7 +7,7 @@ def create_app(config_object="website.config"):
 
     mongo.init_app(app)
 
-    from .views import osuStats
+    from .views import user_route, main_route
     
     @app.template_filter('commafy')
     def commafy(value):
@@ -17,6 +16,7 @@ def create_app(config_object="website.config"):
         else:
             return format(int(value), ',d')
     
-    app.register_blueprint(osuStats.views)
+    app.register_blueprint(main_route)
+    app.register_blueprint(user_route)
 
     return app
