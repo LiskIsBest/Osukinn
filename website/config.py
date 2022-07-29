@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # secret key
-SECRET_KEY = os.environ.get("SECURE_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # MongoDB connection url
 MONGO_URI = os.environ.get("MONGO_URI")
