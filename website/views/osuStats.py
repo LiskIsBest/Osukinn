@@ -30,10 +30,10 @@ def makeUser(api: object, username: str) -> dict:
     getRank = lambda mode, username: 9_999_999_999 if (api.user(username,mode=mode).rankHistory == None) else api.user(username,mode=mode).rankHistory.data[-1]
     return {"_id": api.user(username).id, 
             "username": username,
-            "std_rank": getRank(username=username,mode="osu"), 
+            "osu_rank": getRank(username=username,mode="osu"), 
             "mania_rank": getRank(username=username,mode="mania"),
             "taiko_rank": getRank(username=username,mode="taiko"),
-            "ctb_rank": getRank(username=username,mode="fruits"),
+            "fruits_rank": getRank(username=username,mode="fruits"),
             "avatar_url": api.user(username).avatar_url,
             "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
             }
