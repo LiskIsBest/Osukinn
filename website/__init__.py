@@ -16,7 +16,7 @@ def create_app(config_object="website.config"):
         else:
             return format(int(value), ',d')
     
-    app.register_blueprint(main_route)
-    app.register_blueprint(user_route)
+    app.register_blueprint(main_route.main)
+    app.register_blueprint(user_route.r_users)
 
     return app
