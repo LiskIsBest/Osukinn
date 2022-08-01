@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request, session
 
 from ..extenstions import mongo
 
@@ -16,8 +16,6 @@ CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
 REDIRECT_URL = os.environ.get("REDIRECT_URL")
 
 osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
-
-
 
 def makeUser(api: object, username: str) -> dict:
     if username == "":
@@ -41,7 +39,7 @@ def makeUser(api: object, username: str) -> dict:
 @main.route('/', methods=["GET","POST"])
 def users():
     user_database = mongo.db.users
-    
+    session["userlist"] = []
     request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
     request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
     username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
@@ -57,8 +55,11 @@ def users():
         else:
             userList[index]=makeUser(api=osuApi,username=osuApi.user(user_id).username)
             user_database.insert_one(userList[index])
+    
+    session["userlist"] = userList
+    session.modified = True
   
-    return render_template("index.html", userList=userList, modeChoice=request_mode, userListStr=request_string)
+    return render_template("index.html", modeChoice=request_mode, userListStr=request_string)
 
 @main.route('/update', methods=["GET","POST"])
 def update():
@@ -66,14 +67,13 @@ def update():
     
     request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
     request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
-    username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
-    def list_strip(value):
-        return value.strip()
-    username_list=list(map(list_strip,username_list))
     
-    user_id_list = [osuApi.user(username_list[index]).id for index in range(len(username_list))]
+    userList = session["userlist"]
+    
+    for user in userList:
+        user_database.update_one({"username":user["username"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})
 
-    for index, id in enumerate(user_id_list):
-        user_database.update_one({"_id":id},{ "$set" :makeUser(api=osuApi,username=username_list[index])})
+    session.pop("userlist", None)
+    session.modified = True
 
     return redirect(f"/?mode={request_mode}&usernames={request_string}")

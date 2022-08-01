@@ -7,7 +7,7 @@ def create_app(config_object="website.config"):
 
     mongo.init_app(app)
 
-    from .views import user_route, main_route
+    from .views import main_route
     
     @app.template_filter('commafy')
     def commafy(value):
@@ -17,6 +17,5 @@ def create_app(config_object="website.config"):
             return format(int(value), ',d')
     
     app.register_blueprint(main_route.main)
-    app.register_blueprint(user_route.r_users)
 
     return app
