@@ -1,21 +1,21 @@
 from flask import Blueprint, redirect, render_template, request, session
 
-from ..extenstions import mongo
+from ..extenstions import mongo, osuApi
 
 main = Blueprint('osuStats', __name__)
 
 import datetime
 
-from ossapi import *
-from dotenv import load_dotenv
-import os
+# from ossapi import *
+# from dotenv import load_dotenv
+# import os
 
-load_dotenv()
-CLIENT_ID = os.environ.get("CLIENT_ID")
-CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-REDIRECT_URL = os.environ.get("REDIRECT_URL")
+# load_dotenv()
+# CLIENT_ID = os.environ.get("CLIENT_ID")
+# CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+# REDIRECT_URL = os.environ.get("REDIRECT_URL")
 
-osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
+# osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
 
 def makeUser(api: object, username: str) -> dict:
     if username == "":
@@ -43,9 +43,7 @@ def users():
     request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
     request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
     username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
-    def list_strip(value):
-        return value.strip()
-    username_list=list(map(list_strip,username_list))
+    username_list=list(map(lambda name: name.strip(),username_list))
 
     userList = [osuApi.user(username).id for username in username_list]
     
