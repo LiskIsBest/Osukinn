@@ -1,21 +1,12 @@
 from flask import Blueprint, redirect, render_template, request, session
+from pymongo import UpdateOne
+from pymongo.errors import BulkWriteError
 
 from ..extenstions import mongo, osuApi
 
 main = Blueprint('osuStats', __name__)
 
 import datetime
-
-# from ossapi import *
-# from dotenv import load_dotenv
-# import os
-
-# load_dotenv()
-# CLIENT_ID = os.environ.get("CLIENT_ID")
-# CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
-# REDIRECT_URL = os.environ.get("REDIRECT_URL")
-
-# osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
 
 def makeUser(api: object, username: str) -> dict:
     if username == "":
@@ -45,6 +36,9 @@ def users():
     username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
     username_list=list(map(lambda name: name.strip(),username_list))
 
+    session["request_mode"] = request_mode
+    session["request_string"] = request_string
+
     userList =[]
     for username in username_list:
         try:
@@ -65,19 +59,27 @@ def users():
   
     return render_template("index.html", modeChoice=request_mode, userListStr=request_string)
 
-@main.route('/update', methods=["GET","POST"])
+@main.route('/update', methods=["GET"])
 def update():
     user_database = mongo.db.users
     
-    request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
-    request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
+    request_mode = session["request_mode"]
+    request_string = session["request_string"]
     
     userList = session["userlist"]
     
-    for user in userList:
-        user_database.update_one({"username":user["username"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})
+    db_requests = [
+        (UpdateOne({"username":user["username"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})) for user in userList
+    ]
+    
+    try:
+        user_database.bulk_write(db_requests, ordered=False)
+    except BulkWriteError as bwe:
+        print(bwe.details)
 
     session.pop("userlist", None)
+    session.pop("request_mode", None)
+    session.pop("request_string", None)
     session.modified = True
 
     return redirect(f"/?mode={request_mode}&usernames={request_string}")

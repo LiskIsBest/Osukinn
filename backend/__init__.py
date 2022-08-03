@@ -1,7 +1,7 @@
 from flask import Flask
 from .extenstions import mongo
 
-def create_app(config_object="website.config"):
+def create_app(config_object="backend.config"):
     app = Flask(__name__)
     app.config.from_object(config_object)
 

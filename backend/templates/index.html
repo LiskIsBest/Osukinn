@@ -69,8 +69,8 @@
     <!-- div for refresh user button -->
     <div>
       <form class="col-12 text-center" method='get', action='/update?'>
-      <input type="hidden" id="mode" name="mode" value="{{ modeChoice }}">
-      <input type="hidden" id="usernames" name="usernames" value="{{ userListStr }}">
+      <input type="hidden" id="mode" name="mode" value="{{ session["request_mode"] }}">
+      <input type="hidden" id="usernames" name="usernames" value="{{ session["request_string"] }}">
     <button>refresh users</button>
     </form>
     </div>
