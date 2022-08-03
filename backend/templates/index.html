@@ -14,6 +14,8 @@
 
   <!-- body start -->
   <body>
+    {% set modeChoice = session["request_mode"] %}
+    {% set requestStr = session["request_string"] %}
     <!-- form to enter usernames -->
     <div class="row d-flex">
       <form class="col-12 text-center" method="get" action="/">
@@ -31,15 +33,47 @@
         </div>
       </form>
     </div>
-    
+
+    <!-- best user div -->
+    {% if session["best_user"] != "debug"%}
+    {% set best_user = session["best_user"]%}
+    <div class="d-flex row justify-content-center border border-secondary">
+      <div class="col-md-6 col-sm-6 col-lg-3 border border-primary">
+        <h1 class="text-center">BEST PLAYER</h1>
+        <h2 class="text-center">{{ best_user.username }}</h2>
+        <img
+          src="{{ best_user.avatar_url }}"
+          class="rounded mx-auto d-block"
+          alt=""
+          width="200px"
+          height="200px"
+        />
+        {% if modeChoice == "mania"%}
+          <p class="text-center">Mania rank: {{ best_user.mania_rank | commafy }}</p>
+        {% elif modeChoice == "osu"%}
+          <p class="text-center">Standard rank: {{ best_user.osu_rank | commafy }}</p>
+        {% elif modeChoice == "taiko"%}
+          <p class="text-center">Taiko rank: {{ best_user.taiko_rank | commafy }}</p>
+        {% elif modeChoice == "fruits" %}
+          <p class="text-center">Ctb rank: {{ best_user.fruits_rank | commafy }}</p>
+        {% else %}
+          <p class="text-center">Mania rank: {{ best_user.mania_rank | commafy }}</p>
+          <p class="text-center">Standard rank: {{ best_user.osu_rank | commafy }}</p>
+          <p class="text-center">Taiko rank: {{ best_user.taiko_rank | commafy }}</p>
+          <p class="text-center">Ctb rank: {{ best_user.fruits_rank | commafy }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
     <!-- div to show users -->
-    <div class="d-flex row d-flex justify-content-center border border-secondary">
+    <div class="d-flex row justify-content-center border border-secondary">
+      <h1 class="text-center">Users</h1>
       {% for user in session["userlist"] %}
       <div
         class="col-md-6 col-sm-6 col-lg-3 border border-primary"
         id="userOne"
       >
-        <h1 class="text-center">{{ user.username }}</h1>
+        <h2 class="text-center">{{ user.username }}</h2>
         <img
           src="{{ user.avatar_url }}"
           class="rounded mx-auto d-block"
@@ -69,8 +103,8 @@
     <!-- div for refresh user button -->
     <div>
       <form class="col-12 text-center" method='get', action='/update?'>
-      <input type="hidden" id="mode" name="mode" value="{{ session["request_mode"] }}">
-      <input type="hidden" id="usernames" name="usernames" value="{{ session["request_string"] }}">
+      <input type="hidden" id="mode" name="mode" value="{{ modeChoice }}">
+      <input type="hidden" id="usernames" name="usernames" value="{{ requestStr }}">
     <button>refresh users</button>
     </form>
     </div>

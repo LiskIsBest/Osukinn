@@ -54,6 +54,14 @@ def users():
             userList[index]=makeUser(api=osuApi,username=osuApi.user(user_id).username)
             user_database.insert_one(userList[index])
     
+    def keyRank(user):
+        return user[f"{request_mode}_rank"]
+    if request_mode != "all":
+        userList.sort(reverse=False,key=keyRank)
+        session["best_user"]=userList[0]
+    else:
+        session["best_user"]="debug"
+
     session["userlist"] = userList
     session.modified = True
   
