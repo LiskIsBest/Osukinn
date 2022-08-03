@@ -45,7 +45,13 @@ def users():
     username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
     username_list=list(map(lambda name: name.strip(),username_list))
 
-    userList = [osuApi.user(username).id for username in username_list]
+    userList =[]
+    for username in username_list:
+        try:
+            userList.append(osuApi.user(username).id)
+        except:
+            # id for None user
+            userList.append(1516945)
     
     for index, user_id in enumerate(userList):
         if user_database.find_one({"_id":user_id}) != None:
