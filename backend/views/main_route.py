@@ -57,7 +57,7 @@ def users():
     session["userlist"] = userList
     session.modified = True
   
-    return render_template("index.html", modeChoice=request_mode, userListStr=request_string)
+    return render_template("index.html")
 
 @main.route('/update', methods=["GET"])
 def update():
