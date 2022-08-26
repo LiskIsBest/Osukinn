@@ -27,7 +27,7 @@ def makeUser(api: object, username: str) -> dict:
             "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
             }
             
-@main.route('/', methods=["GET","POST"])
+@main.route('/', methods=["GET"])
 def users():
     user_database = mongo.db.users
     session["userlist"] = []
@@ -56,7 +56,8 @@ def users():
     
     def keyRank(user):
         return user[f"{request_mode}_rank"]
-    if request_mode != "all":
+    
+    if request_mode != "all" and len(userList) > 1:
         userList.sort(reverse=False,key=keyRank)
         session["best_user"]=userList[0]
     else:
