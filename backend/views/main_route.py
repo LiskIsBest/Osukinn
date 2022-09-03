@@ -16,9 +16,10 @@ def makeUser(api: object, username: str) -> dict:
             api.user(username).username
         except ValueError:
             username = "None"
+    user_id = api.user(username).id
     getRank = lambda mode, username: 9_999_999_999 if (api.user(username,mode=mode).rankHistory == None) else api.user(username,mode=mode).rankHistory.data[-1]
-    return {"_id": api.user(username).id, 
-            "username": username,
+    return {"_id": user_id, 
+            "username": api.user(user_id).username,
             "osu_rank": getRank(username=username,mode="osu"), 
             "mania_rank": getRank(username=username,mode="mania"),
             "taiko_rank": getRank(username=username,mode="taiko"),
@@ -78,7 +79,7 @@ def update():
     userList = session["userlist"]
     
     db_requests = [
-        (UpdateOne({"username":user["username"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})) for user in userList
+        (UpdateOne({"_id":user["_id"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})) for user in userList
     ]
     
     try:
