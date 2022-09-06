@@ -16,6 +16,6 @@ def create_app(config_object="backend.config"):
         else:
             return format(int(value), ',d')
     
-    app.register_blueprint(main_route.main)
+    app.register_blueprint(main_route.app)
 
     return app

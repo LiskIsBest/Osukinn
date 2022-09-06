@@ -1,10 +1,10 @@
 from flask import Blueprint, redirect, render_template, request, session
 from pymongo import UpdateOne
-from pymongo.errors import BulkWriteError
+from pymongo.errors import BulkWriteError, ServerSelectionTimeoutError
 
 from ..extenstions import mongo, osuApi
 
-main = Blueprint('osuStats', __name__)
+app = Blueprint('osuStats', __name__)
 
 import datetime
 
@@ -27,8 +27,8 @@ def makeUser(api: object, username: str) -> dict:
             "avatar_url": api.user(username).avatar_url,
             "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
             }
-            
-@main.route('/', methods=["GET"])
+
+@app.route('/', methods=["GET"])
 def users():
     user_database = mongo.db.users
     session["userlist"] = []
@@ -69,7 +69,7 @@ def users():
   
     return render_template("index.html")
 
-@main.route('/update', methods=["GET"])
+@app.route('/update', methods=["GET"])
 def update():
     user_database = mongo.db.users
     
