@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, session
 from pymongo import UpdateOne
-from pymongo.errors import BulkWriteError, ServerSelectionTimeoutError
+from pymongo.errors import BulkWriteError
 
 from ..extenstions import mongo, osuApi
 
