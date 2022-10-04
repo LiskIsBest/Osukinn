@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, redirect, render_template, request, session
+from flask import Flask, redirect, render_template, request, session
 from flask_pymongo import PyMongo
 from .extenstions import osuApi
 
