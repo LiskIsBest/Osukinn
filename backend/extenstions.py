@@ -1,7 +1,3 @@
-from flask_pymongo import PyMongo
-
-mongo = PyMongo()
-
 from ossapi import *
 from dotenv import load_dotenv
 import os
