@@ -1,6 +1,11 @@
 from flask import Flask, redirect, render_template, request, session
 from flask_pymongo import PyMongo
 from .extenstions import osuApi
+import requests
+from requests.sessions import Session
+import time
+from threading import Thread,local
+from queue import Queue
 
 def create_app(config_object="backend.config"):
     app = Flask(__name__)
@@ -12,7 +17,6 @@ def create_app(config_object="backend.config"):
             return "No rank"
         else:
             return format(int(value), ',d')
-
     mongo = PyMongo(app)
 
     import datetime
@@ -37,15 +41,15 @@ def create_app(config_object="backend.config"):
                 "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
                 }
 
-    @app.route("/testUpdate/<username>")
+    @app.route("/update/<username>")
     def updateUser(username):
         with mongo.db.users as user_database:
             request_username = "None" if username == "" else username
             user_id = osuApi.user(request_username).id
-            PyMongo.UpdateOne({"_id":user_id},{ "$set" :makeUser(api=osuApi,username=user_id)})
+            user_database.UpdateOne({"_id":user_id},{ "$set" :makeUser(api=osuApi,username=user_id)})
     
-    @app.route("/testRetrieve/<mode>/<username>",methods=["GET"])
-    def getUser(mode: string, username):
+    @app.route("/retrieve/<mode>/<username>",methods=["GET"])
+    def getUser(mode: str, username):
         user_database = mongo.db.users
         
         request_mode = "mania" if mode == None else mode
@@ -67,7 +71,7 @@ def create_app(config_object="backend.config"):
         
         data_requested: dict = {}
             
-        if request_mode != "all"
+        if request_mode != "all":
             data_requested = {
                 "_id":user_data["_id"],
                 f"{request_mode}_rank":user_data[f"{request_mode}_rank"],
@@ -81,7 +85,6 @@ def create_app(config_object="backend.config"):
     
     @app.route('/', methods=["GET"])
     def users():
-        user_database = mongo.db.users
         session["userlist"] = []
         request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
         request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
@@ -92,19 +95,36 @@ def create_app(config_object="backend.config"):
         session["request_string"] = request_string
 
         userList =[]
-        for username in username_list:
-            try:
-                userList.append(osuApi.user(username).id)
-            except:
-                # id for None user
-                userList.append(1516945)
-        
-        for index, user_id in enumerate(userList):
-            if user_database.find_one({"_id":user_id}) != None:
-                userList[index]=user_database.find_one({"_id":user_id})
-            else:
-                userList[index]=makeUser(api=osuApi,username=osuApi.user(user_id).username)
-                user_database.insert_one(userList[index])
+
+        url_list = [f"{request.url_root}retrieve/{request_mode}/{username}" for username in username_list]
+        q = Queue(maxsize=0)            #Use a queue to store all URLs
+        for url in url_list:
+            q.put(url)
+        thread_local = local()          #The thread_local will hold a Session object
+
+        def get_session() -> Session:
+            if not hasattr(thread_local,'session'):
+                thread_local.session = requests.Session() # Create a new Session if not exists
+            return thread_local.session
+
+        def get_user_data() -> None:
+            session = get_session()
+            while True:
+                url = q.get()
+                with session.get(url) as response:
+                    userList.append(response.json())
+                q.task_done()          # tell the queue, this url downloading work is done
+
+        def get_all_data(urls) -> None:
+            thread_num = len(username_list)
+            if thread_num > 10:
+                thread_num=10
+            for i in range(thread_num):
+                t_worker = Thread(target=get_user_data)
+                t_worker.start()
+            q.join()
+
+        get_all_data(url_list)
         
         def keyRank(user):
             return user[f"{request_mode}_rank"]
@@ -122,21 +142,47 @@ def create_app(config_object="backend.config"):
 
     @app.route('/update', methods=["GET"])
     def update():
-        user_database = mongo.db.users
+        user_list = session["userlist"]
+        username_list = [user["username"] for user in user_list]
+
+        # db_requests = [
+        #     (PyMongo.UpdateOne({"_id":user["_id"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})) for user in userList
+        # ]
         
-        request_mode = session["request_mode"]
-        request_string = session["request_string"]
-        
-        userList = session["userlist"]
-        
-        db_requests = [
-            (PyMongo.UpdateOne({"_id":user["_id"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})) for user in userList
-        ]
-        
-        try:
-            user_database.bulk_write(db_requests, ordered=False)
-        except PyMongo.BulkWriteError as bwe:
-            print(bwe.details)
+        # try:
+        #     user_database.bulk_write(db_requests, ordered=False)
+        # except PyMongo.BulkWriteError as bwe:
+        #     print(bwe.details)
+
+        url_list = [f"{request.url_root}update/{username}" for username in username_list]
+        q = Queue(maxsize=0)            #Use a queue to store all URLs
+        for url in url_list:
+            q.put(url)
+        thread_local = local()          #The thread_local will hold a Session object
+
+        def get_session() -> Session:
+            if not hasattr(thread_local,'session'):
+                thread_local.session = requests.Session() # Create a new Session if not exists
+            return thread_local.session
+
+        def update_user_data() -> None:
+            session = get_session()
+            while True:
+                url = q.get()
+                # with session.get(url) as response: pass
+                response = session.get(url)
+                q.task_done()          # tell the queue, this url downloading work is done
+
+        def update_all_users(urls) -> None:
+            thread_num = len(username_list)
+            if thread_num > 10:
+                thread_num=10
+            for i in range(thread_num):
+                t_worker = Thread(target=update_user_data)
+                t_worker.start()
+            q.join()
+
+        update_all_users(url_list)
 
         session.pop("userlist", None)
         session.pop("request_mode", None)

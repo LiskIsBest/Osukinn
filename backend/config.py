@@ -12,5 +12,5 @@ MONGO_URI = os.environ.get("MONGO_URI")
 TZ = os.environ.get("TZ")
 
 # Flask settings
-FLASK_ENV=os.environ.get("FLASK_ENV")
+FLASK_DEBUG=os.environ.get("FLASK_DEBUG")
 FLASK_APP=os.environ.get("FLASK_APP")
