@@ -37,6 +37,13 @@ def create_app(config_object="backend.config"):
                 "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
                 }
 
+    @app.route("/testUpdate/<username>")
+    def updateUser(username):
+        with mongo.db.users as user_database:
+            request_username = "None" if username == "" else username
+            user_id = osuApi.user(request_username).id
+            PyMongo.UpdateOne({"_id":user_id},{ "$set" :makeUser(api=osuApi,username=user_id)})
+    
     @app.route("/testRetrieve/<mode>/<username>",methods=["GET"])
     def getUser(mode: string, username):
         user_database = mongo.db.users
@@ -47,7 +54,7 @@ def create_app(config_object="backend.config"):
         user_data: dict = {}
         
         try:
-            user_id = osuApi.user(username).id
+            user_id = osuApi.user(request_username).id
         except:
             # id for None user
             user_id = 1516945
