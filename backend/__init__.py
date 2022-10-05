@@ -37,6 +37,31 @@ def create_app(config_object="backend.config"):
                 "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
                 }
 
+    @app.route("/testRetrieve/<mode>/<username>",methods=["GET"])
+    def getUser(mode, username):
+        user_database = mongo.db.users
+        
+        request_mode = "mania" if mode == None else mode
+        request_string = "None" if username == "" else username
+#         username_list = request_string.split(',') if username != None else ["None"]
+#         username_list=list(map(lambda name: name.strip(),username_list))
+        
+    ############################################################ make get request for one user
+        userList =[]
+        for username in username_list:
+            try:
+                userList.append(osuApi.user(username).id)
+            except:
+                # id for None user
+                userList.append(1516945)
+                
+        for index, user_id in enumerate(userList):
+            if user_database.find_one({"_id":user_id}) != None:
+                userList[index]=user_database.find_one({"_id":user_id})
+            else:
+                userList[index]=makeUser(api=osuApi,username=osuApi.user(user_id).username)
+                user_database.insert_one(userList[index])
+    
     @app.route('/', methods=["GET"])
     def users():
         user_database = mongo.db.users
