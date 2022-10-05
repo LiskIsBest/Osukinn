@@ -38,29 +38,39 @@ def create_app(config_object="backend.config"):
                 }
 
     @app.route("/testRetrieve/<mode>/<username>",methods=["GET"])
-    def getUser(mode, username):
+    def getUser(mode: string, username):
         user_database = mongo.db.users
         
         request_mode = "mania" if mode == None else mode
-        request_string = "None" if username == "" else username
-#         username_list = request_string.split(',') if username != None else ["None"]
-#         username_list=list(map(lambda name: name.strip(),username_list))
+        request_username = "None" if username == "" else username
+        user_id: int = 0
+        user_data: dict = {}
         
-    ############################################################ make get request for one user
-        userList =[]
-        for username in username_list:
-            try:
-                userList.append(osuApi.user(username).id)
-            except:
-                # id for None user
-                userList.append(1516945)
-                
-        for index, user_id in enumerate(userList):
-            if user_database.find_one({"_id":user_id}) != None:
-                userList[index]=user_database.find_one({"_id":user_id})
-            else:
-                userList[index]=makeUser(api=osuApi,username=osuApi.user(user_id).username)
-                user_database.insert_one(userList[index])
+        try:
+            user_id = osuApi.user(username).id
+        except:
+            # id for None user
+            user_id = 1516945
+    
+        if user_database.find_one({"_id":user_id}) != None:
+            user_data =user_database.find_one({"_id":user_id})
+        else:
+            user_data = makeUser(api=osuApi,username=osuApi.user(user_id).username)
+            user_database.insert_one(user_data)
+        
+        data_requested: dict = {}
+            
+        if request_mode != "all"
+            data_requested = {
+                "_id":user_data["_id"],
+                f"{request_mode}_rank":user_data[f"{request_mode}_rank"],
+                "avatar_url": user_data["avatar_url"],
+                "last_time_refreshed": user_data["last_time_refreshed"]
+            }
+        else:
+            data_requested = user_data
+        
+        return data_requested
     
     @app.route('/', methods=["GET"])
     def users():
