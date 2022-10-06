@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template, request, session
-from flask_pymongo import PyMongo
+# from flask_pymongo import PyMongo
+from pymongo import MongoClient, update_one, find, insert_one
 from .extenstions import osuApi
 import requests
 from requests.sessions import Session
@@ -43,10 +44,11 @@ def create_app(config_object="backend.config"):
 
     @app.route("/update/<username>")
     def updateUser(username):
-        with mongo.db.users as user_database:
+        with MongoClient() as mongo:
+            user_database = mongo.db.users
             request_username = "None" if username == "" else username
             user_id = osuApi.user(request_username).id
-            user_database.UpdateOne({"_id":user_id},{ "$set" :makeUser(api=osuApi,username=user_id)})
+            user_database.update_one({"_id":user_id},{ "$set" :makeUser(api=osuApi,username=user_id)})
     
     @app.route("/retrieve/<mode>/<username>",methods=["GET"])
     def getUser(mode: str, username):
@@ -64,7 +66,7 @@ def create_app(config_object="backend.config"):
             user_id = 1516945
     
         if user_database.find_one({"_id":user_id}) != None:
-            user_data =user_database.find_one({"_id":user_id})
+            user_data =user_database.find({"_id":user_id})
         else:
             user_data = makeUser(api=osuApi,username=osuApi.user(user_id).username)
             user_database.insert_one(user_data)
