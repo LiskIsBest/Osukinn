@@ -10,7 +10,6 @@ from queue import Queue
 
 import datetime
 import os
-import json
 
 from dotenv import load_dotenv
 
