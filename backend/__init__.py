@@ -21,8 +21,6 @@ CLIENT_ID: int = os.environ.get("CLIENT_ID")
 CLIENT_SECRET: str = os.environ.get("CLIENT_SECRET")
 REDIRECT_URL: str = os.environ.get("REDIRECT_URL")
 
-osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET,REDIRECT_URL)
-
 def create_app(config_object="backend.config") -> None:
 
     """ Flask app initialization """
@@ -64,12 +62,14 @@ def create_app(config_object="backend.config") -> None:
 
     """ Flask_restful: get user data """
     class UserData(Resource):
+        osuApi = OssapiV2(CLIENT_ID, CLIENT_SECRET,REDIRECT_URL)
+
         def get(self,username):
             mongo.init_app(app)
             user_database = mongo.db.users
             request_username: str = "None" if username == "" else username
             try:
-                user_id = osuApi.user(request_username).id
+                user_id = self.osuApi.user(request_username).id
             except:
                 # id for None user
                 user_id = 1516945
@@ -77,7 +77,7 @@ def create_app(config_object="backend.config") -> None:
             if user_database.find_one({"_id":user_id}) != None:
                 user_data =user_database.find_one({"_id":user_id})
             else:
-                user_data = makeUser(username=osuApi.user(user_id).username)
+                user_data = makeUser(username=self.osuApi.user(user_id).username)
                 user_database.insert_one(user_data)
 
             return user_data
@@ -86,7 +86,7 @@ def create_app(config_object="backend.config") -> None:
             mongo.init_app(app)
             user_database = mongo.db.users
             request_username = "None" if username == "" else username
-            user_id = osuApi.user(request_username).id
+            user_id = self.osuApi.user(request_username).id
             user_database.update_one({"_id":user_id},{ "$set" :makeUser(username=user_id)})
 
     """ route for home page """
