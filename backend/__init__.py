@@ -80,8 +80,6 @@ def create_app(config_object="backend.config") -> None:
                 user_data = makeUser(username=osuApi.user(user_id).username)
                 user_database.insert_one(user_data)
 
-            # data_to_return = json.dumps(user_data, indent=4)
-
             return user_data
 
         def put(self,username):
@@ -91,53 +89,6 @@ def create_app(config_object="backend.config") -> None:
             user_id = osuApi.user(request_username).id
             user_database.update_one({"_id":user_id},{ "$set" :makeUser(username=user_id)})
 
-    # """ Flask_restful: update user data """
-    # class UserUpdate(Resource):
-    #     def get(self,username):
-    #         mongo.init_app(app)
-    #         user_database = mongo.db.users
-    #         request_username = "None" if username == "" else username
-    #         user_id = osuApi.user(request_username).id
-    #         user_database.update_one({"_id":user_id},{ "$set" :makeUser(username=user_id)})
-
-    # @app.route("/update/string:<username>")
-    # def updateUser(username: str)->None:
-    #     # with MongoClient() as mongo:
-    #     user_database = mongo.db.users
-    #     request_username = "None" if username == "" else username
-    #     user_id = osuApi.user(request_username).id
-    #     user_database.update_one({"_id":user_id},{ "$set" :makeUser(api=osuApi,username=user_id)})
-    
-    # @app.route("/retrieve/<string:username>",methods=["GET","POST"])
-    # def getUser(username: str)->dict:
-    #     user_database = mongo.db.users
-        
-    #     request_username: str = "None" if username == "" else username
-    #     user_id: int = 0
-    #     user_data: dict = {}
-        
-    #     try:
-    #         user_id = osuApi.user(request_username).id
-    #     except:
-    #         # id for None user
-    #         user_id = 1516945
-    #     if user_database.find_one({"_id":user_id}) != None:
-    #         user_data =user_database.find_one({"_id":user_id})
-    #     else:
-    #         user_data = makeUser(api=osuApi,username=osuApi.user(user_id).username)
-    #         user_database.insert_one(user_data)
-        
-    #     return user_data
-    #     # return {"_id": 1, 
-    #     #         "username": "Bob",
-    #     #         "osu_rank": 12, 
-    #     #         "mania_rank": 12,
-    #     #         "taiko_rank": 12,
-    #     #         "fruits_rank": 12,
-    #     #         "avatar_url": "https://www.copahost.com/blog/wp-content/uploads/2019/07/imgsize2.png",
-    #     #         "last_time_refreshed": datetime.datetime.now().replace(microsecond=0)
-    #     #         }
-    
     """ route for home page """
     @app.route('/', methods=["GET"])
     def users():
@@ -150,15 +101,13 @@ def create_app(config_object="backend.config") -> None:
         session["request_mode"] = request_mode
         session["request_string"] = request_string
 
-        # request_params=[{"mode":request_mode, "username": username} for username in username_list]
-
         userList =[]
 
         url_list = [f"{request.url_root}users/{username}" for username in username_list]
-        q = Queue(maxsize=0)            #Use a queue to store all URLs
+        q = Queue(maxsize=0) #Use a queue to store all URLs
         for url in url_list:
             q.put(url)
-        thread_local = local()          #The thread_local will hold a Session object
+        thread_local = local() #The thread_local will hold a Session object
 
         def get_session() -> Session:
             if not hasattr(thread_local,'session'):
@@ -171,7 +120,7 @@ def create_app(config_object="backend.config") -> None:
                 url = q.get()
                 with session.get(url) as response:
                     userList.append(response.json())
-                q.task_done()          # tell the queue, this url downloading work is done
+                q.task_done() # tell the queue, this url is done
 
         def get_all_data(urls) -> None:
             thread_num = len(username_list)
@@ -206,20 +155,11 @@ def create_app(config_object="backend.config") -> None:
         user_list = session["userlist"]
         username_list = [user["username"] for user in user_list]
 
-        # db_requests = [
-        #     (PyMongo.UpdateOne({"_id":user["_id"]},{ "$set" :makeUser(api=osuApi,username=user["username"])})) for user in userList
-        # ]
-        
-        # try:
-        #     user_database.bulk_write(db_requests, ordered=False)
-        # except PyMongo.BulkWriteError as bwe:
-        #     print(bwe.details)
-
         url_list = [f"{request.url_root}users/{username}" for username in username_list]
-        q = Queue(maxsize=0)            #Use a queue to store all URLs
+        q = Queue(maxsize=0) #Use a queue to store all URLs
         for url in url_list:
             q.put(url)
-        thread_local = local()          #The thread_local will hold a Session object
+        thread_local = local() #The thread_local will hold a Session object
 
         def get_session() -> Session:
             if not hasattr(thread_local,'session'):
@@ -231,7 +171,7 @@ def create_app(config_object="backend.config") -> None:
             while True:
                 url = q.get()
                 with session.put(url) as response: pass
-                q.task_done()          # tell the queue, this url downloading work is done
+                q.task_done() # tell the queue, this url is done
 
         def update_all_users(urls) -> None:
             thread_num = len(username_list)
