@@ -2,7 +2,7 @@ from flask import Flask
 
 from .routes import main, rest_api
 
-def create_app(config_object="website.config") -> None:
+def create_app(config_object="website.config") -> object:
 
     """ Flask app initialization """
     app = Flask(__name__)
