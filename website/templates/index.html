@@ -96,7 +96,7 @@
           <p class="text-center">Taiko rank: {{ user.taiko_rank | commafy }}</p>
           <p class="text-center">Ctb rank: {{ user.fruits_rank | commafy }}</p>
         {% endif %}
-        <p class="text-center">Last queried(utc-4): {{ user.last_time_refreshed }}</p>
+        <p class="text-center">Last queried(utc): {{ user.last_time_refreshed }}</p>
       </div>
       {% endfor %}
     </div>
@@ -104,7 +104,6 @@
     <!-- div for refresh user button -->
     <div>
       <form class="col-12 text-center" method='get', action='/update'>
-        <input type="hidden" id="update" name="update">
         <button>refresh users</button>
     </form>
     </div>
