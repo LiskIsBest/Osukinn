@@ -77,6 +77,5 @@ def data(username) -> dict:
             return user_data
 
         case "PUT":
-            user_id = osuApi.user(request_username).id
             user_database.update_one({"_id":user_id},{ "$set" :makeUser(username=user_id)})
             return '', 204
