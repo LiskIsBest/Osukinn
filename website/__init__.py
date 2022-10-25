@@ -1,6 +1,6 @@
 from flask import Flask
 
-from .routes import main, rest_api
+from .routes import main, site_api
 
 def create_app(config_object="website.config") -> object:
 
@@ -18,6 +18,6 @@ def create_app(config_object="website.config") -> object:
             return format(int(value), ',d')
 
     app.register_blueprint(main.main, url_prefix="/")
-    app.register_blueprint(rest_api.api,url_prefix="/users/")
+    app.register_blueprint(site_api.api,url_prefix="/users/")
 
     return app
