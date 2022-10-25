@@ -96,7 +96,7 @@
           <p class="text-center">Taiko rank: {{ user.taiko_rank | commafy }}</p>
           <p class="text-center">Ctb rank: {{ user.fruits_rank | commafy }}</p>
         {% endif %}
-        <p class="text-center">Last queried(utc-4): {{ user.last_time_refreshed }}</p>
+        <p class="text-center">Last queried(GMT-4): {{ user.last_time_refreshed }}</p>
       </div>
       {% endfor %}
     </div>
@@ -104,7 +104,6 @@
     <!-- div for refresh user button -->
     <div>
       <form class="col-12 text-center" method='get', action='/update'>
-        <input type="hidden" id="update" name="update">
         <button>refresh users</button>
     </form>
     </div>
@@ -113,6 +112,15 @@
     <!-- WIP text div -->
     <div class="col-12 row d-flex">
       <h3 class="text-center">Work in progress</h3>
+    </div>
+    <div class="col-12 row d-flex">
+      <ul class="text-center">
+        <li>Mode selector: choose which gamemode to use when showing rank.</li>
+        <li>The "all" gamemode option lists all ranks for each gamemode per player.</li>
+        <li>If any other gamemode is selected with more than one user entered, the highest ranked user will be shown above the others.</li>
+        <li>Text box: enter Osu! profile usernames seperated by commas. EX: "jakads, whitecat"</li>
+        <li>Refresh button: refreshes data for each user listed.</li>
+      </ul>
     </div>
   </body>
 
