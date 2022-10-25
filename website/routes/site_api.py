@@ -65,18 +65,17 @@ def data(username) -> dict:
         # id for None user
         user_id = 1516945
 
-    if request.method == "GET":
+    match request.method:
+        case "GET":
+            if user_database.find_one({"_id":user_id}) != None:
+                user_data = user_database.find_one({"_id":user_id})
+            else:
+                user_data = makeUser(username=osuApi.user(user_id).username)
+                user_database.insert_one(user_data)
 
-        if user_database.find_one({"_id":user_id}) != None:
-            user_data = user_database.find_one({"_id":user_id})
-        else:
-            user_data = makeUser(username=osuApi.user(user_id).username)
-            user_database.insert_one(user_data)
+            return user_data
 
-        return user_data
-
-    elif request.method == "PUT":
-
-        user_id = osuApi.user(request_username).id
-        user_database.update_one({"_id":user_id},{ "$set" :makeUser(username=user_id)})
-        return '', 204
+        case "PUT":
+            user_id = osuApi.user(request_username).id
+            user_database.update_one({"_id":user_id},{ "$set" :makeUser(username=user_id)})
+            return '', 204
