@@ -23,13 +23,14 @@ def makeUser(username: str) -> dict:
     osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
     
     # Check if username is valid. if not set name to "None"
-    if username == "":
-        username = "None"
-    else:
-        try:
-            osuApi.user(username).username
-        except ValueError:
+    match username:
+        case "":
             username = "None"
+        case _:
+            try:
+                osuApi.user(username).username
+            except ValueError:
+                username = "None"
     
     # pull user id
     user_id = osuApi.user(username).id
