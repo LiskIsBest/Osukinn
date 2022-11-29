@@ -1,5 +1,5 @@
 from flask import Blueprint, request, current_app
-from flask_pymongo import PyMongo
+from pymongo import MongoClient
 
 from ossapi import *
 
@@ -54,8 +54,9 @@ def data(username) -> dict:
 
     osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
 
-    mongo = PyMongo(current_app)
-    user_database = mongo.db.users
+    client = MongoClient(os.environ.get("MONGO_URI"))
+    db = client.userUsernames
+    user_database = db.users
 
     request_username: str = "None" if username == "" else username
 
