@@ -1,1 +1,1 @@
-web: gunicorn --workers=8 runner:app
+web: gunicorn --workers=8 backend:app
