@@ -1,23 +1,24 @@
 from pydantic import BaseModel, Field, validator
-from bson import ObjectId
+import datetime
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid objectid")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
-
-class user(BaseModel):
-    id: int = Field(alias="_id")
+class user_data_class(BaseModel):
+    user_id: int
     username: str
+    osu_rank: int
+    mania_rank: int
+    taiko_rank: int
+    fruits_rank: int
+    avatar_url: str
+    last_time_refreshed: datetime.datetime
+
+    class Config:
+        allow_population_by_field_name = True
+        json_encoders = {datetime.datetime: str}
+
+
+
+
+
+
 
 
