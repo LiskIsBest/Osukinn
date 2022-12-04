@@ -9,3 +9,7 @@ Link: [Osukinn.com](https://www.osukinn.com/)
   - If any other gamemode is selected with more than one user entered, the highest ranked user will be shown above the others.
 - Text box: enter Osu! profile usernames seperated by commas. EX: "jakads, whitecat"
 - Refresh button: refreshes data for each user listed.
+
+### Extra
+- Osu api wrapper: [circleguard/ossapi](https://github.com/circleguard/ossapi)
+- Deployed with: [Railway.app](https://railway.app/)
