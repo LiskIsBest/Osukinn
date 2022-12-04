@@ -6,9 +6,7 @@ load_dotenv()
 # secret key
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# MongoDB connection url
-MONGO_URI = os.environ.get("MONGO_URI")
-
+# timezone
 TZ = os.environ.get("TZ")
 
 # Flask settings
