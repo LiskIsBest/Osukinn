@@ -75,13 +75,15 @@
         id="userOne"
       >
         <h2 class="text-center">{{ user.username }}</h2>
-        <img
+        <a href="https://osu.ppy.sh/users/{{user.user_id}}" target="_blank">
+          <img
           src="{{ user.avatar_url }}"
           class="rounded mx-auto d-block"
           alt=""
           width="200px"
           height="200px"
-        />
+          />
+        </a>
         {% if modeChoice == "mania"%}
           <p class="text-center">Mania rank: {{ user.mania_rank | commafy }}</p>
         {% elif modeChoice == "osu"%}
