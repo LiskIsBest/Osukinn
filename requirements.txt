@@ -12,7 +12,6 @@ MarkupSafe==2.1.1
 oauthlib==3.2.2
 osrparse==6.0.1
 ossapi==2.4.2
-pydantic==1.10.2
 pymongo==4.3.3
 python-dotenv==0.21.0
 requests==2.28.1
