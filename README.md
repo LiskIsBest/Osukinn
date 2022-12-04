@@ -1,4 +1,4 @@
-# Osukinn.com
+# Osukinn.com  Work in progress
 Osukinn.com is a website that allows you to search, using one or more usernames, for user stats for the game [Osu!](https://osu.ppy.sh/home)
 
 Link: [Osukinn.com](https://www.osukinn.com/)
