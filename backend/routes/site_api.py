@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from pymongo import MongoClient
 from bson import json_util
 import json
@@ -25,7 +25,10 @@ def makeUser(username: str) -> user_data_class:
 
     # osu api connection
     osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
-    
+
+    # pull user id
+    user_id = osuApi.user(username).id
+
     # Check if username is valid. if not set name to "None"
     match username:
         case "":
@@ -35,23 +38,10 @@ def makeUser(username: str) -> user_data_class:
                 osuApi.user(username).username
             except ValueError:
                 username = "None"
-    
-    # pull user id
-    user_id = osuApi.user(username).id
 
     # function to pull global rank for specified gamemode. 9_999_999_999 used as No rank found value
     getRank = lambda mode, username: 9_999_999_999 if (osuApi.user(username,mode=mode).rankHistory == None) else osuApi.user(username,mode=mode).rankHistory.data[-1]
 
-    # dictionary matching MongoDB document layout
-    # return {"_id": user_id, 
-    #         "username": osuApi.user(user_id).username,
-    #         "osu_rank": getRank(username=username,mode="osu"), 
-    #         "mania_rank": getRank(username=username,mode="mania"),
-    #         "taiko_rank": getRank(username=username,mode="taiko"),
-    #         "fruits_rank": getRank(username=username,mode="fruits"),
-    #         "avatar_url": osuApi.user(username).avatar_url,
-    #         "last_time_refreshed": str(datetime.datetime.now().replace(microsecond=0))
-    #         }
     return user_data_class(
             user_id = user_id,
             username = osuApi.user(user_id).username,
@@ -89,7 +79,7 @@ def data(username) -> dict:
             if user_database.find_one({"user_id":user_id}) != None:
                 user_data = user_database.find_one({"user_id":user_id})
             else:
-                user_data = makeUser(username=request_username)
+                user_data = makeUser(username=user_id)
                 user_database.insert_one(user_data)
 
             return parse_json(user_data)
