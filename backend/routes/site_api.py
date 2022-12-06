@@ -35,7 +35,6 @@ def makeUser(username: str) -> dict:
     # pull user data
     user = osuApi.users(user_ids=[osuApi.user(username).id])[0]
 
-
     # function to pull global rank for specified gamemode. 9_999_999_999 used as No rank found value
     def getRank(user: UserCompact, mode: str)->int:
         rankStat = eval(f"user.statistics_rulesets.{mode}")
@@ -62,7 +61,7 @@ def data(username) -> dict:
     osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
 
     client = MongoClient(os.environ.get("MONGO_URI"))
-    db = client.userUsernames
+    db = client.osukinnData
     user_database = db.users
 
     request_username: str = "None" if username == "" else username
