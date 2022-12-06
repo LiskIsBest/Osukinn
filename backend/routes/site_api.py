@@ -32,20 +32,25 @@ def makeUser(username: str) -> dict:
             except ValueError:
                 username = "None"
     
-    # pull user id
-    user_id = osuApi.user(username).id
+    # pull user data
+    user = osuApi.users(user_ids=[osuApi.user(username).id])[0]
+
 
     # function to pull global rank for specified gamemode. 9_999_999_999 used as No rank found value
-    getRank = lambda mode, username: 9_999_999_999 if (osuApi.user(username,mode=mode).rankHistory == None) else osuApi.user(username,mode=mode).rankHistory.data[-1]
-    
+    def getRank(user: UserCompact, mode):
+        rankStat = eval(f"user.statistics_rulesets.{mode}")
+        if rankStat == None:
+            return 9_999_999_999
+        return rankStat.global_rank
+
     # dictionary matching MongoDB document layout
-    return {"_id": user_id, 
-            "username": osuApi.user(user_id).username,
-            "osu_rank": getRank(username=username,mode="osu"), 
-            "mania_rank": getRank(username=username,mode="mania"),
-            "taiko_rank": getRank(username=username,mode="taiko"),
-            "fruits_rank": getRank(username=username,mode="fruits"),
-            "avatar_url": osuApi.user(username).avatar_url,
+    return {"_id": user.id, 
+            "username": user.username,
+            "osu_rank": getRank(user=user,mode="osu"), 
+            "mania_rank": getRank(user=user,mode="mania"),
+            "taiko_rank": getRank(user=user,mode="taiko"),
+            "fruits_rank": getRank(user=user,mode="fruits"),
+            "avatar_url": user.avatar_url,
             "last_time_refreshed": str(datetime.datetime.now().replace(microsecond=0))
             }
 
