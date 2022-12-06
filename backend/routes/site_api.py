@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_cors import CORS
 from pymongo import MongoClient
 
 from ossapi import *
@@ -15,6 +16,7 @@ CLIENT_SECRET: str = os.environ.get("CLIENT_SECRET")
 REDIRECT_URL: str = os.environ.get("REDIRECT_URL")
 
 api = Blueprint("api",__name__)
+CORS(api)
 
 """ Returns User data in dictionary """
 def makeUser(username: str) -> dict:
