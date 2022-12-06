@@ -47,7 +47,8 @@ def makeUser(username: str) -> dict:
         return 9_999_999_999
 
     # dictionary matching MongoDB document layout
-    return {"_id": user.id, 
+    return {"_id": user.id,
+            "public_id": user.id,
             "username": user.username,
             "osu_rank": getRank(user=user,mode="osu"), 
             "mania_rank": getRank(user=user,mode="mania"),
