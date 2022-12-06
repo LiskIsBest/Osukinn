@@ -37,11 +37,13 @@ def makeUser(username: str) -> dict:
 
 
     # function to pull global rank for specified gamemode. 9_999_999_999 used as No rank found value
-    def getRank(user: UserCompact, mode):
+    def getRank(user: UserCompact, mode: str)->int:
         rankStat = eval(f"user.statistics_rulesets.{mode}")
-        if rankStat == None:
-            return 9_999_999_999
-        return rankStat.global_rank
+        if rankStat != None:
+            if rankStat.global_rank == None:
+                return 9_999_999_999
+            return rankStat.global_rank
+        return 9_999_999_999
 
     # dictionary matching MongoDB document layout
     return {"_id": user.id, 
