@@ -62,7 +62,7 @@ def data(username) -> dict:
     osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
 
     client = MongoClient(os.environ.get("MONGO_URI"))
-    db = client.userUsernames
+    db = client.osukinnData
     user_database = db.users
 
     request_username: str = "None" if username == "" else username
