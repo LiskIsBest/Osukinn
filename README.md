@@ -12,6 +12,9 @@ Link: [Osukinn.com](https://www.osukinn.com/)
 
 ### Extra
 - Osu api wrapper: [circleguard/ossapi](https://github.com/circleguard/ossapi)
+- Backend built with flask
+- Frontend built with svelte
+- Using MongoDB
 - Deployed with: [Railway.app](https://railway.app/)
 
 
