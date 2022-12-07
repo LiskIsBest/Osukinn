@@ -13,7 +13,7 @@ Webiste address: [Osukinn.com](https://www.osukinn.com/)
 ### Extra
 - Osu api wrapper: [circleguard/ossapi](https://github.com/circleguard/ossapi)
 - Backend built with flask
-- Frontend built with svelte [LiskIsBest](https://github.com/LiskIsBest/Osukinn_frontend)
+- Frontend built with svelte [LiskIsBest/Osukinn_frontend](https://github.com/LiskIsBest/Osukinn_frontend)
 - Using MongoDB
 - Deployed with: [Railway.app](https://railway.app/)
 
