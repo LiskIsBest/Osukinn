@@ -1,7 +1,7 @@
 # Osukinn.com
 Osukinn.com is a website that allows you to search, using one or more usernames, for user stats for the game [Osu!](https://osu.ppy.sh/home)
 
-Link: [Osukinn.com](https://www.osukinn.com/)
+Webiste address: [Osukinn.com](https://www.osukinn.com/)
 
 # Usage
 - Mode selector: choose which gamemode to use when showing rank.
@@ -13,7 +13,7 @@ Link: [Osukinn.com](https://www.osukinn.com/)
 ### Extra
 - Osu api wrapper: [circleguard/ossapi](https://github.com/circleguard/ossapi)
 - Backend built with flask
-- Frontend built with svelte
+- Frontend built with svelte [LiskIsBest](https://github.com/LiskIsBest/Osukinn_frontend)
 - Using MongoDB
 - Deployed with: [Railway.app](https://railway.app/)
 
