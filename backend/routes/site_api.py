@@ -78,8 +78,8 @@ def data(username) -> dict:
 
     match request.method:
         case "GET":
-            if user_database.find_one({"_id":user_id}) != None:
-                user_data = user_database.find_one({"_id":user_id})
+            if (data := user_database.find_one({"_id":user_id})) != None:
+                user_data = data
             else:
                 user_data = makeUser(username=user_id)
                 user_database.insert_one(user_data)
