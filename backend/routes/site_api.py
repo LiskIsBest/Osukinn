@@ -38,7 +38,7 @@ def makeUser(username: str) -> dict:
     user = osuApi.users(user_ids=[osuApi.user(username).id])[0]
 
     # function to pull global rank for specified gamemode. 9_999_999_999 used as No rank found value
-    def getRank(user: UserCompact, mode: str)->int:
+    def getRank(user, mode):
         rankStat = eval(f"user.statistics_rulesets.{mode}")
         if rankStat != None:
             if rankStat.global_rank == None:
