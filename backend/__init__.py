@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
+
 from .routes import main, site_api
 
 """ Flask app initialization """
