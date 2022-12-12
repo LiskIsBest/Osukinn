@@ -101,7 +101,7 @@ def data(username):
         # check if user id exists
         user_id = osuApi.user(user=request_username).id
     except:
-        # id for None user
+        # id for "None" user
         user_id = 1516945
 
     match request.method:
