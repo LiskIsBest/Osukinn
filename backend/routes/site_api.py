@@ -1,13 +1,13 @@
+from datetime import date, datetime
+import json
+import os
+
 from flask import Blueprint, request
 from flask_cors import CORS
 from pymongo import MongoClient
 
-from ossapi import *
-
-import datetime
-
 from dotenv import load_dotenv
-import os
+from ossapi import *
 
 load_dotenv() 
 
@@ -74,7 +74,7 @@ def make_user(username):
             "taiko_rank": get_rank(user = user, mode = "taiko"),
             "fruits_rank": get_rank(user = user, mode = "fruits"),
             "avatar_url": user.avatar_url,
-            "last_time_refreshed": str(datetime.datetime.now().replace(microsecond=0)),
+            "last_time_refreshed": datetime.now().replace(microsecond=0),
             (osu_songs := get_song_data(user_id = user.id, mode = "osu"))[0] : osu_songs[1],
             (mania_songs := get_song_data(user_id = user.id, mode = "mania"))[0] : mania_songs[1],
             (taiko_songs := get_song_data(user_id = user.id, mode = "taiko"))[0] : taiko_songs[1],
