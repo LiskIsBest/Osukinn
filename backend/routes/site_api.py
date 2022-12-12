@@ -18,7 +18,7 @@ REDIRECT_URL = os.environ.get("REDIRECT_URL")
 api = Blueprint(name="api",import_name=__name__)
 CORS(app=api)
 
-""" Returns User data in dictionary """
+# makes dictionaries for database entries
 def make_user(username):
 
     # osu api connection
@@ -30,7 +30,7 @@ def make_user(username):
             username = "None"
         case _:
             try:
-                osuApi.user(user = username).username
+                osuApi.user(user=username).username
             except ValueError:
                 username = "None"
     
@@ -81,6 +81,7 @@ def get_song_data(api, user_id, mode):
         for index, score in enumerate(songs)
     ]
 
+# serializer for mongoDB json dumps
 def user_json_serializer(value):
     if isinstance(value, (date, datetime)):
         return value.isoformat(sep=" ")
