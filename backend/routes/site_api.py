@@ -81,6 +81,10 @@ def make_user(username):
             (fruits_songs := get_song_data(user_id = user.id, mode = "fruits"))[0] : fruits_songs[1],
             }
 
+def user_json_serializer(value):
+    if isinstance(value,(date,datetime)):
+        return value.isoformat(sep=" ")
+
 @api.route("<string:username>",methods=["GET","PUT"])
 def data(username):
 
@@ -107,7 +111,7 @@ def data(username):
                 user_data = make_user(username=user_id)
                 user_database.insert_one(user_data)
 
-            return user_data
+            return json.dumps(user_data, default=user_json_serializer, indent=3)
 
         case "PUT":
             user_database.update_one({"_id" : user_id},{"$set" : make_user(username = user_id)})
