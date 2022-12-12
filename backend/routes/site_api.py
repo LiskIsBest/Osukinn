@@ -37,16 +37,6 @@ def make_user(username):
     # pull user data
     user = osuApi.users(user_ids=[osuApi.user(username).id])[0]
 
-    # function to pull global rank for specified gamemode. 9_999_999_999 used as "No rank" found value
-    def get_rank(user, mode):
-        rankStat = eval(f"user.statistics_rulesets.{mode}")
-        if rankStat != None:
-            if rankStat.global_rank == None:
-                return 9_999_999_999
-            return rankStat.global_rank
-        return 9_999_999_999
-
-
     # dictionary matching MongoDB document layout
     return {"_id": user.id,
             "publicId": user.id,
