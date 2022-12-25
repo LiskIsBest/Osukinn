@@ -4,10 +4,10 @@ import os
 
 from flask import Blueprint, request
 from flask_cors import CORS
-from pymongo import MongoClient
-
 from dotenv import load_dotenv
 from ossapi import *
+
+from ..extensions import mongo
 
 load_dotenv() 
 
@@ -91,8 +91,7 @@ def data(username):
 
     osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
 
-    client = MongoClient(host=os.environ.get("MONGO_URI"))
-    db = client.osukinnData
+    db = mongo.osukinnData
     user_database = db.users
 
     request_username = "None" if username == "" else username
