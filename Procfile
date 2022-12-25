@@ -1,1 +1,1 @@
-web: cd frontend && npm run build && cd ../ && gunicorn --workers=8 backend:app
+web: gunicorn --workers=8 backend:app
