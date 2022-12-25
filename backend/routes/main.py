@@ -10,11 +10,11 @@ main = Blueprint("main",__name__)
 
 @main.route("/")
 def base():
-    return send_from_directory("../frontend", "index.html")
+    return send_from_directory("../frontend/dist", "index.html")
 
 @main.route("/<path:path>")
 def home(path):
-    return send_from_directory("../frontend", path)
+    return send_from_directory("../frontend/dist", path)
 
 """ route for update """
 @main.route('/update', methods=["GET"])
