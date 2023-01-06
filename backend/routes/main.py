@@ -45,7 +45,7 @@ def update() -> ResponseReturnValue:
         while True: # execute the requests
             url = q.get()
             with session.put(url) as response: pass
-            q.task_done() # tell the queue, this url is done
+            q.task_done() # tell the queue this url is done
 
     def update_all_users(urls) -> None:
 
