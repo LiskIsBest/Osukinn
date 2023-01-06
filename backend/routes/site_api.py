@@ -4,10 +4,10 @@ import os
 
 from flask import Blueprint, request
 from flask_cors import CORS
-from pymongo import MongoClient
-
 from dotenv import load_dotenv
 from ossapi import *
+
+from ..extensions import mongo
 
 load_dotenv() 
 
@@ -19,7 +19,10 @@ api = Blueprint(name="api",import_name=__name__)
 CORS(app=api)
 
 # makes dictionaries for database entries
-def make_user(username, osuApi: OssapiV2):
+def make_user(username):
+
+    # osu api connection
+    osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
     
     # Check if username is valid. if not set name to "None"
     match username:
@@ -88,8 +91,7 @@ def data(username):
 
     osuApi = OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URL)
 
-    client = MongoClient(host=os.environ.get("MONGO_URI"))
-    db = client.osukinnData
+    db = mongo.osukinnData
     user_database = db.users
 
     request_username = "None" if username == "" else username
@@ -106,11 +108,11 @@ def data(username):
             if (data := user_database.find_one({"_id" : user_id})) != None:
                 user_data = data
             else:
-                user_data = make_user(username=user_id, osuApi=osuApi)
+                user_data = make_user(username=user_id)
                 user_database.insert_one(user_data)
 
             return json.dumps(user_data, default=user_json_serializer, indent=3)
 
         case "PUT":
-            user_database.update_one({"_id" : user_id},{"$set" : make_user(username=user_id, osuApi=osuApi)})
+            user_database.update_one({"_id" : user_id},{"$set" : make_user(username=user_id)})
             return '', 204
