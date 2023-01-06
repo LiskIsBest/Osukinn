@@ -21,8 +21,8 @@ def home(path):
 def update() -> ResponseReturnValue:
 
     # grab mode and user list from url parameters
-    request_mode = "mania" if request.args.get("mode") == None else request.args.get("mode")
-    request_string = "None" if request.args.get("usernames") == "" else request.args.get("usernames")
+    request_mode = requests.args.get("mode","mania")
+    request_string = requests.args.get("usernames","None")
     
     # makes list of usernames
     username_list = request_string.split(',') if request.args.get("usernames") != None else ["None"]
