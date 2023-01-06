@@ -21,7 +21,7 @@ def home(path):
 def update() -> ResponseReturnValue:
 
     # grab mode and user list from url parameters
-    request_mode = requests.args.get("mode","mania")
+    request_mode = requests.args.get("mode","all")
     request_string = requests.args.get("usernames","None")
     
     # makes list of usernames
