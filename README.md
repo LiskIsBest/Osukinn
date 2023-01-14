@@ -1,3 +1,5 @@
+# THIS IS A WIP BRANCH. SWAPPING FROM FLASK TO FASTAPI.
+
 # Osukinn.com
 Osukinn.com is a website that allows you to search, using one or more usernames, for user stats for the game [Osu!](https://osu.ppy.sh/home)
 
@@ -11,9 +13,9 @@ Webiste address: [Osukinn.com](https://www.osukinn.com/)
 
 ### Extra
 - Osu api wrapper: [circleguard/ossapi](https://github.com/circleguard/ossapi)
-- Backend built with flask
-- Frontend built with svelte [LiskIsBest/Osukinn_frontend](https://github.com/LiskIsBest/Osukinn_frontend)
-- Using MongoDB
+- Backend built with FastApi.
+- Frontend built with Svelte.
+- Using MongoDB as the database.
 - Deployed with: [Railway.app](https://railway.app/)
 
 
