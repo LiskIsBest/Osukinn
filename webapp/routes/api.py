@@ -15,20 +15,20 @@ def makeUser(username):
     osuApi = NewOsuApiConnection()
     
     # Check if username is valid. if not set name to "None"
-    if username == "":
-        username = "None"
+    # if username == "":
+    #     username = "None"
     
-    if not osuApi.user(user=username):
-        username = "None"
+    # if not osuApi.user(user=username):
+    #     username = "None"
 
-    # match username:
-    #     case "":
-    #         username = "None"
-    #     case _:
-    #         try:
-    #             osuApi.user(user=username).username
-    #         except ValueError:
-    #             username = "None"
+    match username:
+        case "":
+            username = "None"
+        case _:
+            try:
+                osuApi.user(user=username)
+            except ValueError:
+                username = "None"
 
     
     # pull user data
@@ -63,18 +63,6 @@ def getRank(user, mode):
 def getSongData(api, user_id, mode):
     songs = api.user_scores(user_id=user_id, type_="best", limit=5, mode=mode)
     return [
-        # {
-        #     "place" : index+1,
-        #     "song_id" : score.best_id,
-        #     "accuracy" : score.accuracy,
-        #     "mods" : str(score.mods),
-        #     "score" : score.score,
-        #     "max_combo" : score.max_combo,
-        #     "unweighted_pp" : score.pp,
-        #     "weighted_pp" : score.weight.pp,
-        #     "weight" : score.weight.percentage,
-        #     "mode" : mode
-        # }
         Song(
             place=index+1,
             song_id=score.best_id,
@@ -96,14 +84,14 @@ def userJsonSerializer(value):
         return value.isoformat(sep=" ")
 
 @router.get("/{username}", response_model=None, status_code=status.HTTP_200_OK)
-async def get_data(username:str="None") -> any:
+async def get_data(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
     mongo = NewMongoConnection()
     db = mongo.osukinnData
     userCollection = db.users
 
-    # username = "None" if username == "" else username
+    username = "None" if username == "" else username
 
     try:
         # check if user id exists
@@ -115,22 +103,22 @@ async def get_data(username:str="None") -> any:
     if (user_doc:= userCollection.find_one({"public_id" : user_id})) != None:
         user_data = user_doc
         mongo.close()
-        return json.dumps(user_data, default=userJsonSerializer, indent=3)
+        return await json.dumps(user_data, default=userJsonSerializer, indent=3)
     else:
         user_data = makeUser(username=user_id)
         userCollection.insert_one(user_data.dict(by_alias=True))
         mongo.close()
-        return user_data.json(by_alias=True)
+        return await user_data.json(by_alias=True)
 
 @router.put("/{username}", response_model=None ,status_code=status.HTTP_200_OK)
-async def update(username:str="None") -> any:
+async def update(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
     mongo = NewMongoConnection()
     db = mongo.osukinnData
     userCollection = db.users
 
-    # username = "None" if username == "" else username
+    username = "None" if username == "" else username
 
     try:
         # check if user id exists
@@ -142,4 +130,4 @@ async def update(username:str="None") -> any:
     userCollection.update_one({"_id" : user_id},{"$set" : makeUser(username=user_id).dict(by_alias=True)})
 
     mongo.close()
-    return {f"{username}":"Updated"}
+    return await {f"{username}":"Updated"}
