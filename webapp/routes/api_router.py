@@ -1,12 +1,10 @@
 from datetime import datetime, date
 import json
-
-from fastapi import APIRouter, status
-
+from fastapi import APIRouter
 from ..extensions import NewOsuApiConnection, NewMongoConnection
 from ..models.models import User, Song, Modes
 
-router = APIRouter(prefix="/users")
+router = APIRouter()
 
 # makes dictionaries for database entries
 def makeUser(username):
@@ -33,7 +31,7 @@ def makeUser(username):
             osu_rank = getRank(user=user, mode=Modes.OSU.value),
             mania_rank = getRank(user=user, mode=Modes.MANIA.value),
             taiko_rank = getRank(user=user, mode=Modes.TAIKO.value),
-            fruits_rank = getRank(user=user, mode=Modes.MANIA.value),
+            fruits_rank = getRank(user=user, mode=Modes.CTB.value),
             avatar_url = user.avatar_url,
             osu_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.OSU.value),
             mania_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.MANIA.value),
@@ -76,7 +74,7 @@ def userJsonSerializer(value):
     if isinstance(value, (date, datetime)):
         return value.isoformat(sep=" ")
 
-@router.get("/{username}", response_model=None, status_code=status.HTTP_200_OK)
+@router.get("/{username}", response_model=None)
 async def get_data(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
@@ -94,16 +92,18 @@ async def get_data(username:str) -> any:
         user_id = 1516945
 
     if (user_doc:= userCollection.find_one({"public_id" : user_id})) != None:
-        user_data = user_doc
+        user_data = User(
+            
+        )
         mongo.close()
-        return await json.dumps(user_data, default=userJsonSerializer, indent=3)
+        return await json.dumps(user_doc, default=userJsonSerializer, indent=3)
     else:
         user_data = makeUser(username=user_id)
         userCollection.insert_one(user_data.dict(by_alias=True))
         mongo.close()
         return await user_data.json(by_alias=True)
 
-@router.put("/{username}", response_model=None ,status_code=status.HTTP_200_OK)
+@router.put("/{username}", response_model=None)
 async def update(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
