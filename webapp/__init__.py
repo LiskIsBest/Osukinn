@@ -6,7 +6,6 @@ import aiohttp
 import asyncio
 
 import os
-from typing import Union
 
 from .routes import api
 
@@ -30,7 +29,7 @@ templates.env.filters["commafy"] = commafy
 app.include_router(api.router)
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, usernames: Union[str, None] == "None,", mode: Union[str, None] == "all"):
+async def index(request: Request, usernames: str = "None,", mode: str = "all"):
 
     # grab mode and user list from url parameters
     # request_mode = "all" if mode == None else mode
@@ -60,7 +59,7 @@ async def index(request: Request, usernames: Union[str, None] == "None,", mode: 
     })
 
 @app.get("/update", response_class=RedirectResponse)
-async def update(usernames: Union[str, None] == "None,", mode: Union[str, None] == "all"):
+async def update(usernames: str = "None,", mode: str = "all"):
     
     username_list = usernames.split(',')
     username_list=list(map(lambda name: name.strip(),username_list)) # remove leading/trailing spaces
