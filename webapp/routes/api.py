@@ -13,13 +13,6 @@ def makeUser(username):
 
     # osu api connection
     osuApi = NewOsuApiConnection()
-    
-    # Check if username is valid. if not set name to "None"
-    # if username == "":
-    #     username = "None"
-    
-    # if not osuApi.user(user=username):
-    #     username = "None"
 
     match username:
         case "":
