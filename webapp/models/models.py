@@ -1,6 +1,7 @@
 from datetime import datetime
 from bson import ObjectId
 from enum import Enum
+from typing import Union
 from pydantic import BaseModel, Field
 
 class Modes(Enum):
@@ -45,7 +46,7 @@ class User(BaseModel):
     taiko_rank: int
     fruits_rank: int
     avatar_url: str
-    last_time_refreshed: datetime = datetime.now().replace(microsecond=0)
+    last_time_refreshed: Union[datetime, str] = datetime.now().replace(microsecond=0)
     osu_songs: list[Song] = []
     mania_songs: list[Song] = []
     taiko_songs: list[Song] = []

@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
-
 from pymongo import MongoClient
 from ossapi import OssapiV2
+load_dotenv()
+
 
 MONGO_URL = os.getenv("MONGO_URI")
 CLIENT_ID = os.getenv("CLIENT_ID")

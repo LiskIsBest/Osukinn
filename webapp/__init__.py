@@ -1,10 +1,8 @@
+import os
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-
-import os
-
-from .routes import api
+import webapp.routes.api_router as api_router
 
 script_dir = os.path.dirname(__file__)
 staticAbsolutePath = os.path.join(script_dir, "static/")
@@ -15,7 +13,7 @@ app = FastAPI(docs_url=None,redoc_url=None)
 
 app.mount("", StaticFiles(directory=frontendAbsolutePath, html=True), name="frontend")
 
-app.include_router(api.router)
+app.include_router(api_router.router, prefix="/users")
 
 @app.get('/')
 async def frontend():
