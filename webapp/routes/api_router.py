@@ -1,6 +1,8 @@
 from datetime import datetime, date
 import json
-from fastapi import APIRouter
+from fastapi import APIRouter, status
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from ..extensions import NewOsuApiConnection, NewMongoConnection
 from ..models.models import User, Song, Modes
 
@@ -74,8 +76,8 @@ def userJsonSerializer(value):
     if isinstance(value, (date, datetime)):
         return value.isoformat(sep=" ")
 
-@router.get("/{username}", response_model=None)
-async def get_data(username:str) -> any:
+@router.get("/{username}", response_model=User, response_class=JSONResponse)
+async def getData(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
     mongo = NewMongoConnection()
@@ -91,19 +93,19 @@ async def get_data(username:str) -> any:
         # id for "None" user
         user_id = 1516945
 
-    if (user_doc:= userCollection.find_one({"public_id" : user_id})) != None:
-        user_data = User(
-            
-        )
+    if (user_data:= await userCollection.find_one({"public_id" : user_id})) != None:
+        user_data = jsonable_encoder(user_data)
         mongo.close()
-        return await json.dumps(user_doc, default=userJsonSerializer, indent=3)
+        return JSONResponse(status_code=status.HTTP_302_FOUND, content=user_data)
     else:
         user_data = makeUser(username=user_id)
-        userCollection.insert_one(user_data.dict(by_alias=True))
+        user_data = jsonable_encoder(user_data)
+        new_user = await userCollection.insert_one(user_data)
+        created_user = await userCollection.find_one({"_id":new_user.public_id})
         mongo.close()
-        return await user_data.json(by_alias=True)
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
 
-@router.put("/{username}", response_model=None)
+@router.put("/{username}", response_model=None ,response_class=JSONResponse)
 async def update(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
@@ -120,7 +122,7 @@ async def update(username:str) -> any:
         # id for "None" user
         user_id = 1516945
 
-    userCollection.update_one({"_id" : user_id},{"$set" : makeUser(username=user_id).dict(by_alias=True)})
-
+    user_data = makeUser(username=user_id)
+    await userCollection.update_one({"public_id": user_data.public_id},{"$set":user_data.dict(by_alias=True)})
     mongo.close()
-    return await {f"{username}":"Updated"}
+    return JSONResponse(status_code=status.HTTP_200_OK, content={f"{username}":"updated"})
