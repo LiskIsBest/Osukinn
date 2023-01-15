@@ -1,7 +1,7 @@
 from datetime import datetime
 from bson import ObjectId
 from enum import Enum
-from typing import Union
+from typing import Union, Optional
 from pydantic import BaseModel, Field
 
 class Modes(Enum):
