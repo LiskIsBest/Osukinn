@@ -5,11 +5,9 @@ from fastapi.staticfiles import StaticFiles
 import webapp.routes.api_router as api_router
 
 script_dir = os.path.dirname(__file__)
-staticAbsolutePath = os.path.join(script_dir, "static/")
-templatesAbsolutePath = os.path.join(script_dir, "templates/")
 frontendAbsolutePath = os.path.join(script_dir, "../frontend/dist")
 
-app = FastAPI(docs_url=None,redoc_url=None)
+app = FastAPI()
 
 app.mount("", StaticFiles(directory=frontendAbsolutePath, html=True), name="frontend")
 
