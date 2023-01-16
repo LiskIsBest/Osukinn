@@ -3,7 +3,7 @@ import json
 from typing import Any
 from bson import ObjectId
 from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic.tools import parse_obj_as
 from ..extensions import NewOsuApiConnection, NewMongoConnection
 from ..models.models import UpdateUser, User, Song, Modes, PyObjectId
@@ -138,7 +138,7 @@ def getData(username:str) -> any:
 		mongo.close()
 		return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
 
-@router.put("/{username}", response_model=None ,response_class=JSONResponse)
+@router.put("/{username}", response_model=None, status_code=status.HTTP_202_ACCEPTED, response_class=RedirectResponse)
 def update(username:str) -> any:
 	osuApi = NewOsuApiConnection()
 
@@ -156,6 +156,6 @@ def update(username:str) -> any:
 		user_id = 1516945
 
 	user_data = makeUser(username=user_id, update=True)
-	_ = userCollection.update_one({"public_id": user_id},{"$set":user_data.dict(by_alias=True)})
+	userCollection.update_one({"public_id": user_id},{"$set":user_data.dict(by_alias=True)})
 	mongo.close()
-	return MyJSONResponse(status_code=status.HTTP_200_OK, content={f"{username}":"updated"})
+	return status.HTTP_202_ACCEPTED
