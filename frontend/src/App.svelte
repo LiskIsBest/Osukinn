@@ -2,6 +2,8 @@
   import User from "./components/User.svelte";
   import Refresh from "./components/Refresh.svelte";
 
+	let unique = {}
+
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   let usernames = urlParams.get("usernames");
@@ -16,6 +18,11 @@
 
   let username_list = usernames.split(",");
   username_list = username_list.map(username => username.trim());
+
+	function ReloadUsers(){
+		unique = {}
+	}
+
 </script>
 
 <main>
@@ -41,10 +48,13 @@
 
   <div class="d-flex row justify-content-center border border-secondary">
     <h1 class="text-center">User</h1>
+		{#key unique}
     <User class="col-md-6 col-sm-6 col-lg-3 border border-primary" username_list={username_list} mode={mode}/>
+		{/key}
   </div>
-
-  <Refresh class="col-12 text-center" username_list={username_list} mode={mode}/>
+	<div class="d-flex row justify-content-center">
+		<Refresh class="col-3 text-center" username_list={username_list} mode={mode} on:ResetUsers={ReloadUsers}/>
+	</div>
 
   <div class="col-12 row d-flex">
     <h3 class="text-center">Work in progress</h3>
