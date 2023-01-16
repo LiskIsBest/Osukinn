@@ -28,7 +28,7 @@
       console.log(`fetching data for user:${username}`)
       const response = await fetch(endpoint(username));
       const data = await response.json();
-      user_data.push(data);
+      user_data.push(JSON.parse(data));
       user_data = user_data;
     })
   })
@@ -38,7 +38,7 @@
 {#each user_data as user}
 <div class="{className}">
   <h2 class="text-center">{user.username}</h2>
-  <a href="https://osu.ppy.sh/users/{user._id}" target="_blank" rel="noreferrer">
+  <a href="https://osu.ppy.sh/users/{user.public_id}" target="_blank" rel="noreferrer">
     <img
       src={user.avatar_url}
       class="rounded mx-auto d-block"
