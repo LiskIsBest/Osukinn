@@ -25,23 +25,8 @@ def makeUser(username, update=False):
 			except ValueError:
 				username = "None"
 
-	
 	# pull user data
 	user = osuApi.users(user_ids=[osuApi.user(username).id])[0]
-
-	# data = User(
-	#         public_id = user.id,
-	#         username = user.username,
-	#         osu_rank = getRank(user=user, mode=Modes.OSU.value),
-	#         mania_rank = getRank(user=user, mode=Modes.MANIA.value),
-	#         taiko_rank = getRank(user=user, mode=Modes.TAIKO.value),
-	#         fruits_rank = getRank(user=user, mode=Modes.CTB.value),
-	#         avatar_url = user.avatar_url,
-	#         osu_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.OSU.value),
-	#         mania_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.MANIA.value),
-	#         taiko_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.TAIKO.value),
-	#         fruits_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.CTB.value)
-	#         )
 	
 	match(update):
 		case False:
