@@ -59,3 +59,22 @@ class User(BaseModel):
 				ObjectId: str,
 				datetime: str,
 				}
+		
+class UpdateUser(BaseModel):
+	username: str = "None"
+	osu_rank: int
+	mania_rank: int
+	taiko_rank: int
+	fruits_rank: int
+	avatar_url: str
+	last_time_refreshed: Union[datetime, str] = datetime.now().replace(microsecond=0)
+	osu_songs: list[Song] = []
+	mania_songs: list[Song] = []
+	taiko_songs: list[Song] = []
+	fruits_songs: list[Song] = []
+
+	class Config:
+		arbitrary_types_allowed = True
+		json_encoders = {
+				datetime: str,
+				}
