@@ -1,6 +1,5 @@
 <script>
   import { onMount } from "svelte";
-  import { userList } from "../stores";
   import axios from "axios";
 
   export let username_list;
@@ -23,16 +22,19 @@
 
   let user_data = [];
 
-  onMount(async function () {
-    username_list.forEach(async (username) => {
+	function showUsers(){
+		username_list.forEach(async (username) => {
       console.log(`fetching data for user:${username}`);
       const response = await axios.get(endpoint(username));
-      userList.update((contents) => [...contents, JSON.parse(response.data)]);
-      userList.subscribe((value) => {
-        user_data = value;
-      });
+      const data = await JSON.parse(response.data)
+			user_data.push(data)
+			user_data = user_data
     });
-  });
+	}
+
+  onMount(function () {
+		showUsers()
+	});
 </script>
 
 {#each user_data as user}
