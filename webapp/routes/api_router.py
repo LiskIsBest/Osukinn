@@ -1,10 +1,12 @@
 from datetime import datetime, date
 import json
+from typing import Any
+from bson import ObjectId
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
+from pydantic.tools import parse_obj_as
 from ..extensions import NewOsuApiConnection, NewMongoConnection
-from ..models.models import User, Song, Modes
+from ..models.models import User, Song, Modes, PyObjectId
 
 router = APIRouter()
 
@@ -72,12 +74,30 @@ def getSongData(api, user_id, mode):
     ]
 
 # serializer for mongoDB json dumps
-def userJsonSerializer(value):
+def myJsonSerializer(value: Any) -> Any:
     if isinstance(value, (date, datetime)):
         return value.isoformat(sep=" ")
+    if isinstance(value,ObjectId):
+        return str(value)
+    if isinstance(value, PyObjectId):
+        return str(value)
+    if isinstance(value, Song):
+        return Song.json(by_alias=True)
 
-@router.get("/{username}", response_model=User, response_class=JSONResponse)
-async def getData(username:str) -> any:
+class MyJSONResponse(JSONResponse):
+    def render(self, content: Any) -> bytes:
+        print("MyJSONResponse is called")
+        return json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=True,
+            indent=None,
+            separators=(",", ":"),
+            default= myJsonSerializer,
+        ).encode("utf-8")
+
+@router.get("/{username}", response_model=None, response_class=JSONResponse)
+def getData(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
     mongo = NewMongoConnection()
@@ -93,20 +113,18 @@ async def getData(username:str) -> any:
         # id for "None" user
         user_id = 1516945
 
-    if (user_data:= await userCollection.find_one({"public_id" : user_id})) != None:
-        user_data = jsonable_encoder(user_data)
+    if (data:= userCollection.find_one({"public_id" : user_id})) != None:
+        user_data = parse_obj_as(User,data)
         mongo.close()
-        return JSONResponse(status_code=status.HTTP_302_FOUND, content=user_data)
+        return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
     else:
         user_data = makeUser(username=user_id)
-        user_data = jsonable_encoder(user_data)
-        new_user = await userCollection.insert_one(user_data)
-        created_user = await userCollection.find_one({"_id":new_user.public_id})
+        userCollection.insert_one(user_data.dict(by_alias=True))
         mongo.close()
-        return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_user)
+        return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
 
 @router.put("/{username}", response_model=None ,response_class=JSONResponse)
-async def update(username:str) -> any:
+def update(username:str) -> any:
     osuApi = NewOsuApiConnection()
 
     mongo = NewMongoConnection()
@@ -123,6 +141,6 @@ async def update(username:str) -> any:
         user_id = 1516945
 
     user_data = makeUser(username=user_id)
-    await userCollection.update_one({"public_id": user_data.public_id},{"$set":user_data.dict(by_alias=True)})
+    userCollection.update_one({"public_id": user_data.public_id},{"$set":user_data.json(by_alias=True)})
     mongo.close()
-    return JSONResponse(status_code=status.HTTP_200_OK, content={f"{username}":"updated"})
+    return MyJSONResponse(status_code=status.HTTP_200_OK, content={f"{username}":"updated"})
