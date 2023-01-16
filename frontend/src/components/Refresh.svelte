@@ -1,24 +1,26 @@
 <script>
-	import { userList } from "../stores";
 	import axios from "axios";
-  import User from "./User.svelte";
+	import { createEventDispatcher } from "svelte";
+
+	const dispatch = createEventDispatcher()
 
   let className = "";
   export { className as class };
 
   export let username_list;
-  // export let mode;
 
 	function endpoint(username) {
     return `${location.origin}/users/${username}`;
   }
-	async function refresh(){
+
+	function refresh(){
 		username_list.forEach(async (username) => {
-			let response = await axios.put(endpoint(username))
-			console.log(JSON.parse(response.data))
+			const response = await axios.put(endpoint(username))
+			console.log(response.status)
 		});
-		userList.update(contents => [...contents])
+		dispatch("ResetUsers")
 	}
+
 </script>
 
 <div>
