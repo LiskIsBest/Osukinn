@@ -1,6 +1,6 @@
 <script>
-  import User from "./User.svelte";
-  import Refresh from "./Refresh.svelte";
+  import User from "./components/User.svelte";
+  import Refresh from "./components/Refresh.svelte";
 
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -44,7 +44,7 @@
     <User class="col-md-6 col-sm-6 col-lg-3 border border-primary" username_list={username_list} mode={mode}/>
   </div>
 
-  <Refresh username_list={username_list} mode={mode}/>
+  <Refresh class="col-12 text-center" username_list={username_list} mode={mode}/>
 
   <div class="col-12 row d-flex">
     <h3 class="text-center">Work in progress</h3>
