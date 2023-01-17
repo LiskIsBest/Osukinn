@@ -7,6 +7,8 @@
   let className = "";
   export { className as class };
 
+	const valid_modes = ["mania","osu","taiko","fruits"]
+
   function addCommas(number) {
     if (number == 9_999_999_999) {
       return "No Rank";
@@ -38,6 +40,9 @@
         });
       })
       .finally(() => {
+				if (valid_modes.includes(mode)){
+					user_data.sort((a,b) => a[`${mode}_rank`] - b[`${mode}_rank`])
+				}
         user_data = user_data;
       });
   });
