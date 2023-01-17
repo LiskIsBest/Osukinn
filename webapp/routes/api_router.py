@@ -138,7 +138,7 @@ def getData(username:str) -> any:
 		mongo.close()
 		return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
 
-@router.put("/{username}", response_model=None, status_code=status.HTTP_202_ACCEPTED, response_class=RedirectResponse)
+@router.put("/{username}", response_model=None, response_class=JSONResponse)
 def update(username:str) -> any:
 	osuApi = NewOsuApiConnection()
 
@@ -158,4 +158,4 @@ def update(username:str) -> any:
 	user_data = makeUser(username=user_id, update=True)
 	userCollection.update_one({"public_id": user_id},{"$set":user_data.dict(by_alias=True)})
 	mongo.close()
-	return status.HTTP_202_ACCEPTED
+	return MyJSONResponse(status_code=status.HTTP_202_ACCEPTED, content={username:"updated", "status": status.HTTP_202_ACCEPTED})
