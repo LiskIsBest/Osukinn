@@ -52,9 +52,8 @@
     <User class="col-md-6 col-sm-6 col-lg-3 border border-primary" username_list={username_list} mode={mode}/>
 		{/key}
   </div>
-	<div class="d-flex row justify-content-center">
-		<Refresh class="col-3 text-center" username_list={username_list} mode={mode} on:ResetUsers={ReloadUsers}/>
-	</div>
+
+	<Refresh username_list={username_list} mode={mode} on:ResetUsers={ReloadUsers}/>
 
   <div class="col-12 row d-flex">
     <h3 class="text-center">Work in progress</h3>
