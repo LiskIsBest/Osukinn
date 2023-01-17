@@ -46,7 +46,7 @@ class User(BaseModel):
 	taiko_rank: int
 	fruits_rank: int
 	avatar_url: str
-	last_time_refreshed: Union[datetime, str] = datetime.now().replace(microsecond=0)
+	last_time_refreshed: datetime
 	osu_songs: list[Song] = []
 	mania_songs: list[Song] = []
 	taiko_songs: list[Song] = []
@@ -67,7 +67,7 @@ class UpdateUser(BaseModel):
 	taiko_rank: int
 	fruits_rank: int
 	avatar_url: str
-	last_time_refreshed: Union[datetime, str] = datetime.now().replace(microsecond=0)
+	last_time_refreshed: datetime
 	osu_songs: list[Song] = []
 	mania_songs: list[Song] = []
 	taiko_songs: list[Song] = []
