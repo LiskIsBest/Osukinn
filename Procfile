@@ -1,1 +1,1 @@
-web: gunicorn --workers=8 backend:app
+web: gunicorn --workers=$WORKERS backend:app
