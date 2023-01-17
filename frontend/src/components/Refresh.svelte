@@ -10,13 +10,22 @@
     return `${location.origin}/users/${username}`;
   }
 
-	function refresh(){
-		username_list.forEach(async (username) => {
-			const response = await axios.put(endpoint(username), {updated:username});
-			const data = await response.data;
-			console.log(data);
+	function makeRequests(username_list){
+		let requests = [];
+		username_list.forEach(async(username)=>{
+			requests.push(axios.put(endpoint(username), {username: "updated"}))
 		});
-		dispatch("ResetUsers");
+		return requests
+	}
+
+	function refresh(){
+		axios.all(makeRequests(username_list)).then((responses) => {
+			responses.forEach((resp) => {
+				console.log(resp.data)
+			})
+		}).finally(()=>{
+			dispatch("ResetUsers");
+		})
 	}
 
 </script>
