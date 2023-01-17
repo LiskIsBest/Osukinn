@@ -2,10 +2,7 @@
 	import axios from "axios";
 	import { createEventDispatcher } from "svelte";
 
-	const dispatch = createEventDispatcher()
-
-  let className = "";
-  export { className as class };
+	const dispatch = createEventDispatcher();
 
   export let username_list;
 
@@ -15,14 +12,15 @@
 
 	function refresh(){
 		username_list.forEach(async (username) => {
-			const response = await axios.put(endpoint(username))
-			console.log(response.status)
+			const response = await axios.put(endpoint(username));
+			const data = await JSON.parse(response.data.toString());
+			console.log(data);
 		});
-		dispatch("ResetUsers")
+		dispatch("ResetUsers");
 	}
 
 </script>
 
-<div>
-	<button class={className} on:click={refresh}>Refresh Users</button>
+<div class="d-flex row justify-content-center">
+	<button class="col-2 text-center" on:click={refresh}>Refresh Users</button>
 </div>
