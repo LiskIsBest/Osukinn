@@ -1,5 +1,3 @@
-# THIS IS A WIP BRANCH. SWAPPING FROM FLASK TO FASTAPI.
-
 # Osukinn.com
 Osukinn.com is a website that allows you to search, using one or more usernames, for user stats for the game [Osu!](https://osu.ppy.sh/home)
 
@@ -19,4 +17,4 @@ Webiste address: [Osukinn.com](https://www.osukinn.com/)
 - Deployed with: [Railway.app](https://railway.app/)
 
 
-#### not finished
+#### working on frontend
