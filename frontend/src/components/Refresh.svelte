@@ -8,20 +8,18 @@
 
 	function endpoint(username) {
     return `${location.origin}/users/${username}`;
-  }
+	}
 
-	function makeRequests(username_list){
+	function refresh(){
 		let requests = [];
 		username_list.forEach(async(username)=>{
 			requests.push(axios.put(endpoint(username), {username: "updated"}))
 		});
-		return requests
-	}
 
-	function refresh(){
-		axios.all(makeRequests(username_list)).then((responses) => {
-			responses.forEach((resp) => {
-				console.log(resp.data)
+		axios.all(requests).then((responses) => {
+			responses.forEach(async (resp) => {
+				const data = await resp.data
+				console.log(data)
 			})
 		}).finally(()=>{
 			dispatch("ResetUsers");

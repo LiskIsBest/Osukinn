@@ -22,19 +22,25 @@
 
   let user_data = [];
 
-	function showUsers(){
-		username_list.forEach(async (username) => {
-      console.log(`fetching data for user:${username}`);
-      const response = await axios.get(endpoint(username));
-      const data = await JSON.parse(response.data);
-			user_data.push(data);
-			user_data = user_data;
-    });
-	}
-
   onMount(function () {
-		showUsers();
-	});
+    let requests = [];
+
+    username_list.forEach(async (username) => {
+      requests.push(axios.get(endpoint(username)));
+    });
+
+    axios
+      .all(requests)
+      .then((responses) => {
+        responses.forEach(async (resp) => {
+          const data = await JSON.parse(resp.data);
+          user_data.push(data);
+        });
+      })
+      .finally(() => {
+        user_data = user_data;
+      });
+  });
 </script>
 
 {#each user_data as user}
