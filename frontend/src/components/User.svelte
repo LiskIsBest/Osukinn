@@ -26,7 +26,7 @@
 		username_list.forEach(async (username) => {
       console.log(`fetching data for user:${username}`);
       const response = await axios.get(endpoint(username));
-      const data = await JSON.parse(response.data.toString());
+      const data = await JSON.parse(response.data);
 			user_data.push(data);
 			user_data = user_data;
     });

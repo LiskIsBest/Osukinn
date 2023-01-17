@@ -12,8 +12,8 @@
 
 	function refresh(){
 		username_list.forEach(async (username) => {
-			const response = await axios.put(endpoint(username));
-			const data = await JSON.parse(response.data.toString());
+			const response = await axios.put(endpoint(username), {updated:username});
+			const data = await response.data;
 			console.log(data);
 		});
 		dispatch("ResetUsers");
