@@ -12,7 +12,7 @@
   if(usernames == null || usernames == ""){
     usernames = "None";
   }
-  if(mode == null || usernames == ""){
+  if(mode == null || mode == ""){
     mode="all";
   }
 
