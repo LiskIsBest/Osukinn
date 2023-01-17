@@ -3,13 +3,13 @@ Osukinn.com is a website that allows you to search, using one or more usernames,
 
 Webiste address: [Osukinn.com](https://www.osukinn.com/)
 
-# Usage
+## Usage
 - Mode selector: choose which gamemode to use when showing rank.
   - The "all" gamemode option lists all ranks for each gamemode per player.
 - Text box: enter Osu! profile usernames seperated by commas. EX: "jakads, whitecat"
 - Refresh button: refreshes data for each user listed.
 
-### Extra
+## Extra
 - Osu api wrapper: [circleguard/ossapi](https://github.com/circleguard/ossapi)
 - Backend built with FastApi.
 - Frontend built with Svelte.
