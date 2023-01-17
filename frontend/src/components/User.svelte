@@ -54,7 +54,7 @@
       <img
         src={user.avatar_url}
         class="rounded mx-auto d-block"
-        alt=""
+        alt="User profile pitcure"
         width="200px"
         height="200px"
       />
