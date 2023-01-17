@@ -101,7 +101,6 @@ def myJsonSerializer(value: Any) -> Any:
 
 class MyJSONResponse(JSONResponse):
 	def render(self, content: Any) -> bytes:
-		print("MyJSONResponse is called")
 		return json.dumps(
 			content,
 			ensure_ascii=False,
