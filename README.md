@@ -17,4 +17,4 @@ Webiste address: [Osukinn.com](https://www.osukinn.com/)
 - Deployed with: [Railway.app](https://railway.app/)
 
 
-### currently working on the frontend
+### work in progress
