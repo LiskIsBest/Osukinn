@@ -1,41 +1,9 @@
-from datetime import datetime
 from bson import ObjectId
-from enum import Enum
 from typing import Union
+from datetime import datetime
 from pydantic import BaseModel, Field
-
-class Modes(Enum):
-	OSU = "osu"
-	MANIA = "mania"
-	TAIKO = "taiko"
-	CTB = "fruits"
-
-class PyObjectId(ObjectId):
-	@classmethod
-	def __get_validators__(cls):
-		yield cls.validate
-
-	@classmethod
-	def validate(cls, v):
-		if not ObjectId.is_valid(v):
-			raise ValueError("Invalid objectid")
-		return ObjectId(v)
-
-	@classmethod
-	def __modify_schema__(cls, field_schema):
-		field_schema.update(type="string")
-
-class Song(BaseModel):
-	place: int
-	song_id: int
-	accuracy: float
-	mods: str
-	score: int
-	max_combo: int
-	unweighted_pp: float
-	weighted_pp: float
-	weight: float
-	mode: str
+from .PyObjectId import PyObjectId
+from .Song import Song
 
 class User(BaseModel):
 	id: Union[PyObjectId, str] = Field(default_factory=PyObjectId, alias="_id")
