@@ -3,12 +3,13 @@ import json
 from typing import Any
 from bson import ObjectId
 from fastapi import APIRouter, status
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse
 from pydantic.tools import parse_obj_as
 from ..extensions import NewOsuApiConnection, NewMongoConnection
-from ..models.models import UpdateUser, User, Song, Modes, PyObjectId
+# from ..models.models import UpdateUser, User, Song, Modes, PyObjectId
+from ..models import UpdateUser, User, Song, Modes, PyObjectId
 
-router = APIRouter()
+api = APIRouter()
 
 # makes dictionaries for database entries
 def makeUser(username, update=False):
@@ -112,7 +113,7 @@ class MyJSONResponse(JSONResponse):
 			default= myJsonSerializer,
 		).encode("utf-8")
 
-@router.get("/{username}", response_model=None, response_class=JSONResponse)
+@api.get("/{username}", response_model=None, response_class=JSONResponse)
 def getData(username:str) -> any:
 	osuApi = NewOsuApiConnection()
 
@@ -139,7 +140,7 @@ def getData(username:str) -> any:
 		mongo.close()
 		return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
 
-@router.put("/{username}", response_model=None, response_class=JSONResponse)
+@api.put("/{username}", response_model=None, response_class=JSONResponse)
 def update(username:str) -> any:
 	osuApi = NewOsuApiConnection()
 
