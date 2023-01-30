@@ -9,7 +9,7 @@ class User(BaseModel):
 	"""
 	Model object for user data.
 
-	All data is pull from the Osu api https://osu.ppy.sh/docs/index.html
+	All data is pulled from the Osu api https://osu.ppy.sh/docs/index.html
 
 	attributes:
 		_id: PyObjectId - MonogoDB ObjectId
