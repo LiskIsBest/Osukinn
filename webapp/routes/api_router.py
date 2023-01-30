@@ -6,7 +6,6 @@ from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from pydantic.tools import parse_obj_as
 from ..extensions import NewOsuApiConnection, NewMongoConnection
-# from ..models.models import UpdateUser, User, Song, Modes, PyObjectId
 from ..models import UpdateUser, User, Song, Modes, PyObjectId
 
 api = APIRouter()
