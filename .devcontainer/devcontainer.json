@@ -1,0 +1,21 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11",
+      "installTools": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+        "settings": {
+            "python.defaultInterpreterPath": "./venv/bin/python",
+            "python.linting.enabled": false
+        }
+    }
+  },
+
+  "postCreateCommand": "pip install virtualenv && virtualenv -p python3.11 venv"
+}
