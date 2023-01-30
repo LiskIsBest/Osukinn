@@ -12,8 +12,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET","PUT"],
     allow_headers=["*"],
 )
                    
@@ -21,7 +20,16 @@ app.include_router(api, prefix="/users")
 
 app.mount("", StaticFiles(directory=frontendAbsolutePath, html=True), name="frontend")
 
-
 @app.get('/')
-def frontend():
-   return RedirectResponse(url='frontend')
+def frontend() -> RedirectResponse:
+	"""
+	Renders "index.html" from the frontend/dist directory
+
+	route: 0.0.0.0/
+
+	parameters:
+		None
+	return:
+		fastapi.responses.RedirectResponse
+	"""
+	return RedirectResponse(url='frontend')
