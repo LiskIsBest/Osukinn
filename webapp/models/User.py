@@ -14,40 +14,28 @@ class User(BaseModel):
 	attributes:
 		_id: PyObjectId - MonogoDB ObjectId
 			Automatically generated on object instantiation.
-
 		public_id: int
 			Osu account id.
-
 		username: str
 			Osu account username.
-
 		osu_rank: int
 			Osu account global rank for the Standard gamemode.
-
 		mania_rank: int
 			Osu account global rank for the Mania gamemode.
-
 		taiko_rank: int
 			Osu account global rank for the Taiko gamemode.
-
 		fruits_rank: int
 			Osu account global rank for the Catch the Beat gamemode.
-
 		avatar_url: str
 			Osu account profile image url.
-
 		last_time_refreshed: datetime
 			Timestamp of when the User object is created.
-
 		osu_songs: list[Song] - default = []
 			List for up to top five plays for Osu Standard gamemode.
-
 		mania_songs: list[Song] - default = []
 			List for up to top five plays for Osu Mania gamemode.
-
 		taiko_songs: list[Song] - default = []
 			List for up to top five plays for Osu Taiko gamemode.
-
 		fruits_songs: list[Song] - default = []
 			List for up to top five plays for Osu Catch the Beat gamemode.
 	"""
@@ -75,7 +63,31 @@ class User(BaseModel):
 		
 class UpdateUser(BaseModel):
 	"""
-	Model for Updated user data.
+	Model for updated user data.
+	
+	attributes:
+		username: str
+			Osu account username.
+		osu_rank: int
+			Osu account global rank for the Standard gamemode.
+		mania_rank: int
+			Osu account global rank for the Mania gamemode.
+		taiko_rank: int
+			Osu account global rank for the Taiko gamemode.
+		fruits_rank: int
+			Osu account global rank for the Catch the Beat gamemode.
+		avatar_url: str
+			Osu account profile image url.
+		last_time_refreshed: datetime
+			Timestamp of when the User object is created.
+		osu_songs: list[Song] - default = []
+			List for up to top five plays for Osu Standard gamemode.
+		mania_songs: list[Song] - default = []
+			List for up to top five plays for Osu Mania gamemode.
+		taiko_songs: list[Song] - default = []
+			List for up to top five plays for Osu Taiko gamemode.
+		fruits_songs: list[Song] - default = []
+			List for up to top five plays for Osu Catch the Beat gamemode.
 	"""
 	username: str = "None"
 	osu_rank: int
