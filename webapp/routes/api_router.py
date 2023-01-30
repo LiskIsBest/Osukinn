@@ -86,13 +86,15 @@ def getRank(user, mode):
 	"""
 	match(mode):
 		case "osu":
-			rankStat: Union[int, None] = user.statistics_ruleset.osu
+			rankStat: Union[int, None] = user.statistics_rulesets.osu
 		case "mania":
-			rankStat: Union[int, None] = user.statistics_ruleset.mania
+			rankStat: Union[int, None] = user.statistics_rulesets.mania
 		case "taiko":
-			rankStat: Union[int, None] = user.statistics_ruleset.taiko
+			rankStat: Union[int, None] = user.statistics_rulesets.taiko
 		case "fruits":
-			rankStat: Union[int, None] = user.statistics_ruleset.fruits
+			rankStat: Union[int, None] = user.statistics_rulesets.fruits
+		case _:
+			raise("Invalid mode entered")
 
 	if rankStat != None:
 		if rankStat.global_rank == None:
