@@ -1,19 +1,27 @@
 from datetime import datetime, date
 import json
-from typing import Any
+from typing import Any, Union
 from bson import ObjectId
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from pydantic.tools import parse_obj_as
-from ..extensions import NewOsuApiConnection, NewMongoConnection
-from ..models import UpdateUser, User, Song, Modes, PyObjectId
+from ossapi import OssapiV2, UserCompact, Score
+from ..extensions import NewOsuApiConnection, NewMongoConnection, Modes, MODES
+from ..models import UpdateUser, User, Song, PyObjectId
 
 api = APIRouter()
 
-# makes dictionaries for database entries
-def makeUser(username, update=False):
+def makeUser(username: Union[str,int], update: bool=False) -> Union[User,UpdateUser]:
+	"""
+	Return User/UpdateUser model object.
 
-	# osu api connection
+	parameters:
+		username: str | int
+			Username or Account ID for Osu account.
+		update: bool
+			True returns an UpdateUser object, False returns a User object.
+	return: models.User | models.UpdateUser
+	"""
 	osuApi = NewOsuApiConnection()
 
 	match username:
@@ -26,7 +34,7 @@ def makeUser(username, update=False):
 				username = "None"
 
 	# pull user data
-	user = osuApi.users(user_ids=[osuApi.user(username).id])[0]
+	user: UserCompact = osuApi.users(user_ids=[osuApi.user(username).id])[0]
 	
 	match(update):
 		case False:
@@ -61,22 +69,57 @@ def makeUser(username, update=False):
 	
 	return data
 
-
-# function to pull global rank for specified gamemode. 9_999_999_999 used as "No rank" found value
 def getRank(user, mode):
-	rankStat = eval(f"user.statistics_rulesets.{mode}")
+	"""
+	Returns a users rank.
+
+	Returns a users global rank for a given osu gamemode.
+	If no rank is found then 9,999,999,999 is returned instead.
+
+	parameters:
+		user: ossapi.UserCompact
+			UserCompact object from the ossapi library.
+
+		mode: str
+			osu, mania, taiko, or fruits
+	return: int
+	"""
+	match(mode):
+		case "osu":
+			rankStat: Union[int, None] = user.statistics_ruleset.osu
+		case "mania":
+			rankStat: Union[int, None] = user.statistics_ruleset.mania
+		case "taiko":
+			rankStat: Union[int, None] = user.statistics_ruleset.taiko
+		case "fruits":
+			rankStat: Union[int, None] = user.statistics_ruleset.fruits
+
 	if rankStat != None:
 		if rankStat.global_rank == None:
 			return 9_999_999_999
 		return rankStat.global_rank
 	return 9_999_999_999
 
-# returns list of top 5 plays for given mode
-def getSongData(api, user_id, mode):
-	songs = api.user_scores(user_id=user_id, type_="best", limit=5, mode=mode)
+def getSongData(api: OssapiV2, user_id: int, mode: str) -> list[dict]:
+	"""
+	Returns a list of Song dictionaries.
+
+	parameters:
+		api: OssapiV2
+			ossapi.OssapiV2 object from makeUser function.
+		user_id: int
+			Account ID for osu account.
+		mode: str
+			osu, mania, taiko, or fruits
+	return: list[dict]
+	"""
+	if mode not in MODES:
+		mode = "osu"
+
+	songs: list[Score] = api.user_scores(user_id=user_id, type_="best", limit=5, mode=mode)
 	return [
 		Song(
-			place=index+1,
+			place=index,
 			song_id=score.best_id,
 			accuracy=score.accuracy,
 			mods=str(score.mods),
@@ -87,11 +130,19 @@ def getSongData(api, user_id, mode):
 			weight=score.weight.percentage,
 			mode=mode
 		).dict()
-		for index, score in enumerate(songs)
+		for index, score in enumerate(songs, start=1)
 	]
 
-# serializer for mongoDB json dumps
 def myJsonSerializer(value: Any) -> Any:
+	"""
+	Custom JSON serializer
+
+	Values:
+		datetime.datetime -> str\n
+		bson.ObjectId -> str\n
+		models.PyObjectId -> str\n
+		models.Song -> json str\n
+	"""
 	if isinstance(value, (date, datetime)):
 		return value.isoformat(sep=" ")
 	if isinstance(value,ObjectId):
@@ -102,6 +153,7 @@ def myJsonSerializer(value: Any) -> Any:
 		return Song.json(by_alias=True)
 
 class MyJSONResponse(JSONResponse):
+	"""Custom JSONResponse object"""
 	def render(self, content: Any) -> bytes:
 		return json.dumps(
 			content,
@@ -112,9 +164,20 @@ class MyJSONResponse(JSONResponse):
 			default= myJsonSerializer,
 		).encode("utf-8")
 
-@api.get("/{username}", response_model=None, response_class=JSONResponse)
-def getData(username:str) -> any:
-	osuApi = NewOsuApiConnection()
+@api.get("/{username}", response_class=MyJSONResponse)
+def getData(username:str) -> MyJSONResponse:
+	"""
+	Returns JSONResponse.
+
+	route: 0.0.0.0/username
+	method: GET
+
+	parameters:
+		username: str
+			{username} path parameter.
+	return: MyJSONResponse
+	"""
+	osuApi: OssapiV2 = NewOsuApiConnection()
 
 	mongo = NewMongoConnection()
 	db = mongo.osukinnData
@@ -139,8 +202,19 @@ def getData(username:str) -> any:
 		mongo.close()
 		return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
 
-@api.put("/{username}", response_model=None, response_class=JSONResponse)
-def update(username:str) -> any:
+@api.put("/{username}", response_class=MyJSONResponse)
+def update(username:str) -> MyJSONResponse:
+	"""
+	Returns JSONResponse.
+
+	route: 0.0.0.0/username
+	method: PUT
+
+	parameters:
+		username: str
+			-{username} path parameter.
+	return: MyJSONResponse
+	"""
 	osuApi = NewOsuApiConnection()
 
 	mongo = NewMongoConnection()
