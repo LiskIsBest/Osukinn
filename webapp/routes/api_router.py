@@ -171,7 +171,7 @@ def getData(username:str) -> MyJSONResponse:
 	"""
 	Returns JSONResponse.
 
-	route: 0.0.0.0/username
+	route: 0.0.0.0/users/username
 	method: GET
 
 	parameters:
@@ -209,7 +209,7 @@ def update(username:str) -> MyJSONResponse:
 	"""
 	Returns JSONResponse.
 
-	route: 0.0.0.0/username
+	route: 0.0.0.0/users/username
 	method: PUT
 
 	parameters:
