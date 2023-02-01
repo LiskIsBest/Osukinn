@@ -214,7 +214,7 @@ def update(username:str) -> MyJSONResponse:
 
 	parameters:
 		username: str
-			-{username} path parameter.
+			{username} path parameter.
 	return: MyJSONResponse
 	"""
 	osuApi = NewOsuApiConnection()
