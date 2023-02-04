@@ -8,7 +8,7 @@ from .routes import api
 script_dir = os.path.dirname(__file__)
 frontendAbsolutePath = os.path.join(script_dir, "../frontend/dist")
 
-app = FastAPI()
+app = FastAPI(redoc_url=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
