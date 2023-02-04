@@ -35,7 +35,7 @@
       .all(requests)
       .then((responses) => {
         responses.forEach(async (resp) => {
-          const data = await JSON.parse(resp.data);
+          const data = await resp.data;
           user_data.push(data);
         });
       })
