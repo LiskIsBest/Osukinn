@@ -197,12 +197,12 @@ def getData(username:str) -> MyJSONResponse:
 	if (data:= userCollection.find_one({"public_id" : user_id})) != None:
 		user_data = parse_obj_as(User,data)
 		mongo.close()
-		return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
+		return MyJSONResponse(status_code=status.HTTP_200_OK, content=json.loads(user_data.json(by_alias=True)))
 	else:
 		user_data = makeUser(username=user_id)
 		userCollection.insert_one(user_data.dict(by_alias=True))
 		mongo.close()
-		return MyJSONResponse(status_code=status.HTTP_200_OK, content=user_data.json(by_alias=True))
+		return MyJSONResponse(status_code=status.HTTP_200_OK, content=json.loads(user_data.json(by_alias=True)))
 
 @api.put("/{username}", response_class=MyJSONResponse)
 def update(username:str) -> MyJSONResponse:
