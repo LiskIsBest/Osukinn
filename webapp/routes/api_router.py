@@ -161,7 +161,7 @@ class MyJSONResponse(JSONResponse):
 			content,
 			ensure_ascii=False,
 			allow_nan=True,
-			indent=None,
+			indent=4,
 			separators=(",", ":"),
 			default= myJsonSerializer,
 		).encode("utf-8")
