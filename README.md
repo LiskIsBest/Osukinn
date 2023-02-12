@@ -10,7 +10,7 @@ Webiste address: [Osukinn.com](https://www.osukinn.com/)
 - Refresh button: refreshes data for each user listed.
 
 ## Extra
-- Osu api wrapper: [LiskIsBest/Losuapi](https://github.com/LiskIsBest/Losuapi)
+- Osu api wrapper: [Losuapi](https://github.com/LiskIsBest/Losuapi)
 - Backend built with FastApi.
 - Frontend built with Svelte.
 - Using MongoDB as the database.
