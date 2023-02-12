@@ -1,17 +1,18 @@
 from datetime import datetime, date
 import json
-from typing import Any, Union
+from typing import Any
 from bson import ObjectId
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from pydantic.tools import parse_obj_as
-from ossapi import OssapiV2, UserCompact, Score
-from ..extensions import NewOsuApiConnection, NewMongoConnection, Modes, MODES
+from losuapi import OsuApi
+from losuapi.types import UserCompact, Score, GameMode
+from ..extensions import NewOsuApiConnection, NewMongoConnection
 from ..models import UpdateUser, User, Song, PyObjectId
 
 api = APIRouter()
 
-def makeUser(username: Union[str,int], update: bool=False) -> Union[User,UpdateUser]:
+def makeUser(username: str | int, update: bool=False) -> User | UpdateUser:
 	"""
 	Return User/UpdateUser model object.
 
@@ -29,42 +30,42 @@ def makeUser(username: Union[str,int], update: bool=False) -> Union[User,UpdateU
 			username = "None"
 		case _:
 			try:
-				osuApi.user(user=username)
+				username = osuApi.user(username=username)
 			except ValueError:
 				username = "None"
 
 	# pull user data
-	user: UserCompact = osuApi.users(user_ids=[osuApi.user(username).id])[0]
+	user: UserCompact = osuApi.users(user_ids=[username.id]).users[0]
 	
 	match(update):
 		case False:
 			data = User(
 				public_id = user.id,
 				username = user.username,
-				osu_rank = getRank(user=user, mode=Modes.OSU.value),
-				mania_rank = getRank(user=user, mode=Modes.MANIA.value),
-				taiko_rank = getRank(user=user, mode=Modes.TAIKO.value),
-				fruits_rank = getRank(user=user, mode=Modes.CTB.value),
+				osu_rank = getRank(user=user, mode=GameMode.OSU.value),
+				mania_rank = getRank(user=user, mode=GameMode.MANIA.value),
+				taiko_rank = getRank(user=user, mode=GameMode.TAIKO.value),
+				fruits_rank = getRank(user=user, mode=GameMode.FRUITS.value),
 				avatar_url = user.avatar_url,
 				last_time_refreshed = datetime.now().replace(microsecond=0),
-				osu_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.OSU.value),
-				mania_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.MANIA.value),
-				taiko_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.TAIKO.value),
-				fruits_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.CTB.value)
+				osu_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.OSU.value),
+				mania_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.MANIA.value),
+				taiko_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.TAIKO.value),
+				fruits_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.FRUITS.value)
 				)
 		case True:
 			data = UpdateUser(
 				username = user.username,
-				osu_rank = getRank(user=user, mode=Modes.OSU.value),
-				mania_rank = getRank(user=user, mode=Modes.MANIA.value),
-				taiko_rank = getRank(user=user, mode=Modes.TAIKO.value),
-				fruits_rank = getRank(user=user, mode=Modes.CTB.value),
+				osu_rank = getRank(user=user, mode=GameMode.OSU.value),
+				mania_rank = getRank(user=user, mode=GameMode.MANIA.value),
+				taiko_rank = getRank(user=user, mode=GameMode.TAIKO.value),
+				fruits_rank = getRank(user=user, mode=GameMode.FRUITS.value),
 				avatar_url = user.avatar_url,
 				last_time_refreshed = datetime.now().replace(microsecond=0),
-				osu_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.OSU.value),
-				mania_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.MANIA.value),
-				taiko_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.TAIKO.value),
-				fruits_songs = getSongData(api=osuApi, user_id=user.id, mode=Modes.CTB.value)
+				osu_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.OSU.value),
+				mania_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.MANIA.value),
+				taiko_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.TAIKO.value),
+				fruits_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.FRUITS.value)
 				)
 	
 	return data
@@ -86,13 +87,13 @@ def getRank(user, mode):
 	"""
 	match(mode):
 		case "osu":
-			rankStat: Union[int, None] = user.statistics_rulesets.osu
+			rankStat: int | None = user.statistics_rulesets.osu
 		case "mania":
-			rankStat: Union[int, None] = user.statistics_rulesets.mania
+			rankStat: int | None = user.statistics_rulesets.mania
 		case "taiko":
-			rankStat: Union[int, None] = user.statistics_rulesets.taiko
+			rankStat: int | None = user.statistics_rulesets.taiko
 		case "fruits":
-			rankStat: Union[int, None] = user.statistics_rulesets.fruits
+			rankStat: int | None = user.statistics_rulesets.fruits
 		case _:
 			raise("Invalid mode entered")
 
@@ -102,23 +103,23 @@ def getRank(user, mode):
 		return rankStat.global_rank
 	return 9_999_999_999
 
-def getSongData(api: OssapiV2, user_id: int, mode: str) -> list[dict]:
+def getSongData(api: OsuApi, user_id: int, mode: str) -> list[dict]:
 	"""
 	Returns a list of Song dictionaries.
 
 	parameters:
-		api: OssapiV2
-			ossapi.OssapiV2 object from makeUser function.
+		api: OsuApi
+			ossapi.OsuApi object from makeUser function.
 		user_id: int
 			Account ID for osu account.
 		mode: str
 			osu, mania, taiko, or fruits
 	return: list[dict]
 	"""
-	if mode not in MODES:
+	if mode not in GameMode.list():
 		mode = "osu"
 
-	songs: list[Score] = api.user_scores(user_id=user_id, type_="best", limit=5, mode=mode)
+	songs: list[Score] = api.user_scores(user_id=user_id, Type="best", limit=5, mode=mode)
 	return [
 		Song(
 			place=index,
@@ -179,17 +180,16 @@ def getData(username:str) -> MyJSONResponse:
 			{username} path parameter.
 	return: MyJSONResponse
 	"""
-	osuApi: OssapiV2 = NewOsuApiConnection()
+	osuApi: OsuApi = NewOsuApiConnection()
 
 	mongo = NewMongoConnection()
 	db = mongo.osukinnData
 	userCollection = db.users
 
 	username = "None" if username == "" else username
-
 	try:
 		# check if user id exists
-		user_id = osuApi.user(user=username).id
+		user_id = osuApi.user(username=username).id
 	except:
 		# id for "None" user
 		user_id = 1516945
@@ -227,7 +227,7 @@ def update(username:str) -> MyJSONResponse:
 
 	try:
 		# check if user id exists
-		user_id = osuApi.user(user=username).id
+		user_id = osuApi.user(username=username).id
 	except:
 		# id for "None" user
 		user_id = 1516945
