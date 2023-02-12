@@ -2,7 +2,7 @@ import os
 from enum import Enum
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from ossapi import OssapiV2
+from losuapi import OsuApi
 load_dotenv()
 
 MONGO_URL = os.getenv("MONGO_URI")
@@ -18,13 +18,5 @@ def NewMongoConnection() -> MongoClient:
         else:
             raise Exception(f"Unable to connect to MongoDB Client.")
         
-def NewOsuApiConnection() -> OssapiV2:
-    return OssapiV2(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
-
-class Modes(Enum):
-	OSU = "osu"
-	MANIA = "mania"
-	TAIKO = "taiko"
-	CTB = "fruits"
-        
-MODES = ["osu","mania","taiko","fruits"]
+def NewOsuApiConnection() -> OsuApi:
+    return OsuApi(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
