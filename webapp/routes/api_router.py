@@ -30,12 +30,15 @@ async def makeUser(username: str | int, update: bool=False) -> User | UpdateUser
 		case "":
 			user_id = 1516945
 		case _:
-			user_id = await OsuApi.user(username=username).id
+			user_id = await OsuApi.user(username=username)
 			if not username:
 				user_id = 1516945
+			else: 
+				user_id = user_id.id
 
 	# pull user data
-	user: UserCompact = await OsuApi.users(user_ids=[user_id]).users[0]
+	user: UserCompact = await OsuApi.users(user_ids=[user_id])
+	user = user.users[0]
 	
 	match(update):
 		case False:
@@ -236,6 +239,6 @@ async def update(username:str) -> MyJSONResponse:
 			else: 
 				user_id = user_id.id
 
-	user_data = makeUser(username=user_id, update=True)
+	user_data = await makeUser(username=user_id, update=True)
 	await userCollection.update_one({"public_id": user_id},{"$set":user_data.dict(by_alias=True)})
 	return MyJSONResponse(status_code=status.HTTP_202_ACCEPTED, content={username:"updated", "status": status.HTTP_202_ACCEPTED})
