@@ -23,7 +23,7 @@ app.mount("", StaticFiles(
 
 
 @app.get('/')
-def frontend() -> RedirectResponse:
+async def frontend() -> RedirectResponse:
     """
     Renders "index.html" from the frontend/dist directory
 
