@@ -5,14 +5,14 @@ from bson import ObjectId
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from pydantic.tools import parse_obj_as
-from losuapi import OsuApi
+from losuapi import AsyncOsuApi
 from losuapi.types import UserCompact, Score, GameMode
-from ..extensions import NewOsuApiConnection, NewMongoConnection
+from ..extensions import NewAsyncMotorConnection, NewAsyncOsuApiConnection
 from ..models import UpdateUser, User, Song, PyObjectId
 
 api = APIRouter()
 
-def makeUser(username: str | int, update: bool=False) -> User | UpdateUser:
+async def makeUser(username: str | int, update: bool=False) -> User | UpdateUser:
 	"""
 	Return User/UpdateUser model object.
 
@@ -23,19 +23,19 @@ def makeUser(username: str | int, update: bool=False) -> User | UpdateUser:
 			True returns an UpdateUser object, False returns a User object.
 	return: models.User | models.UpdateUser
 	"""
-	osuApi = NewOsuApiConnection()
+
+	OsuApi: AsyncOsuApi = NewAsyncOsuApiConnection()
 
 	match username:
 		case "":
-			username = "None"
+			user_id = 1516945
 		case _:
-			try:
-				username = osuApi.user(username=username)
-			except ValueError:
-				username = "None"
+			user_id = await OsuApi.user(username=username).id
+			if not username:
+				user_id = 1516945
 
 	# pull user data
-	user: UserCompact = osuApi.users(user_ids=[username.id]).users[0]
+	user: UserCompact = await OsuApi.users(user_ids=[user_id]).users[0]
 	
 	match(update):
 		case False:
@@ -48,10 +48,10 @@ def makeUser(username: str | int, update: bool=False) -> User | UpdateUser:
 				fruits_rank = getRank(user=user, mode=GameMode.FRUITS.value),
 				avatar_url = user.avatar_url,
 				last_time_refreshed = datetime.now().replace(microsecond=0),
-				osu_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.OSU.value),
-				mania_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.MANIA.value),
-				taiko_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.TAIKO.value),
-				fruits_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.FRUITS.value)
+				osu_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.OSU.value),
+				mania_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.MANIA.value),
+				taiko_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.TAIKO.value),
+				fruits_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.FRUITS.value)
 				)
 		case True:
 			data = UpdateUser(
@@ -62,10 +62,10 @@ def makeUser(username: str | int, update: bool=False) -> User | UpdateUser:
 				fruits_rank = getRank(user=user, mode=GameMode.FRUITS.value),
 				avatar_url = user.avatar_url,
 				last_time_refreshed = datetime.now().replace(microsecond=0),
-				osu_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.OSU.value),
-				mania_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.MANIA.value),
-				taiko_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.TAIKO.value),
-				fruits_songs = getSongData(api=osuApi, user_id=user.id, mode=GameMode.FRUITS.value)
+				osu_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.OSU.value),
+				mania_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.MANIA.value),
+				taiko_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.TAIKO.value),
+				fruits_songs = await getSongData(api=OsuApi, user_id=user.id, mode=GameMode.FRUITS.value)
 				)
 	
 	return data
@@ -78,7 +78,7 @@ def getRank(user, mode):
 	If no rank is found then 9,999,999,999 is returned instead.
 
 	parameters:
-		user: ossapi.UserCompact
+		user: losuapi.types.UserCompact
 			UserCompact object from the ossapi library.
 
 		mode: str
@@ -103,13 +103,13 @@ def getRank(user, mode):
 		return rankStat.global_rank
 	return 9_999_999_999
 
-def getSongData(api: OsuApi, user_id: int, mode: str) -> list[dict]:
+async def getSongData(api: AsyncOsuApi, user_id: int, mode: str) -> list[dict]:
 	"""
 	Returns a list of Song dictionaries.
 
 	parameters:
 		api: OsuApi
-			ossapi.OsuApi object from makeUser function.
+			losuapi.AsyncOsuApi object from makeUser function.
 		user_id: int
 			Account ID for osu account.
 		mode: str
@@ -119,7 +119,7 @@ def getSongData(api: OsuApi, user_id: int, mode: str) -> list[dict]:
 	if mode not in GameMode.list():
 		mode = "osu"
 
-	songs: list[Score] = api.user_scores(user_id=user_id, Type="best", limit=5, mode=mode)
+	songs: list[Score] = await api.user_scores(user_id=user_id, Type="best", limit=5, mode=mode)
 	return [
 		Song(
 			place=index,
@@ -168,7 +168,7 @@ class MyJSONResponse(JSONResponse):
 		).encode("utf-8")
 
 @api.get("/{username}", response_class=MyJSONResponse)
-def getData(username:str) -> MyJSONResponse:
+async def getData(username:str) -> MyJSONResponse:
 	"""
 	Returns JSONResponse.
 
@@ -180,32 +180,32 @@ def getData(username:str) -> MyJSONResponse:
 			{username} path parameter.
 	return: MyJSONResponse
 	"""
-	osuApi: OsuApi = NewOsuApiConnection()
+	OsuApi: AsyncOsuApi = NewAsyncOsuApiConnection()
 
-	mongo = NewMongoConnection()
+	mongo = NewAsyncMotorConnection()
 	db = mongo.osukinnData
 	userCollection = db.users
 
-	username = "None" if username == "" else username
-	try:
-		# check if user id exists
-		user_id = osuApi.user(username=username).id
-	except:
-		# id for "None" user
-		user_id = 1516945
+	match(username):
+		case "":
+			user_id = 1516945
+		case _:
+			user_id = await OsuApi.user(username=username)
+			if not user_id:
+				user_id = 1516945
+			else: 
+				user_id = user_id.id
 
-	if (data:= userCollection.find_one({"public_id" : user_id})) != None:
+	if (data:= await userCollection.find_one({"public_id" : user_id})) != None:
 		user_data = parse_obj_as(User,data)
-		mongo.close()
 		return MyJSONResponse(status_code=status.HTTP_200_OK, content=json.loads(user_data.json(by_alias=True)))
 	else:
-		user_data = makeUser(username=user_id)
-		userCollection.insert_one(user_data.dict(by_alias=True))
-		mongo.close()
+		user_data = await makeUser(username=user_id)
+		await userCollection.insert_one(user_data.dict(by_alias=True))
 		return MyJSONResponse(status_code=status.HTTP_200_OK, content=json.loads(user_data.json(by_alias=True)))
 
 @api.put("/{username}", response_class=MyJSONResponse)
-def update(username:str) -> MyJSONResponse:
+async def update(username:str) -> MyJSONResponse:
 	"""
 	Returns JSONResponse.
 
@@ -217,22 +217,25 @@ def update(username:str) -> MyJSONResponse:
 			{username} path parameter.
 	return: MyJSONResponse
 	"""
-	osuApi = NewOsuApiConnection()
 
-	mongo = NewMongoConnection()
+	OsuApi: AsyncOsuApi = NewAsyncOsuApiConnection()
+
+	mongo = NewAsyncMotorConnection()
 	db = mongo.osukinnData
 	userCollection = db.users
 
 	username = "None" if username == "" else username
 
-	try:
-		# check if user id exists
-		user_id = osuApi.user(username=username).id
-	except:
-		# id for "None" user
-		user_id = 1516945
+	match(username):
+		case "":
+			user_id = 1516945
+		case _:
+			user_id = await OsuApi.user(username=username)
+			if not user_id:
+				user_id = 1516945
+			else: 
+				user_id = user_id.id
 
 	user_data = makeUser(username=user_id, update=True)
-	userCollection.update_one({"public_id": user_id},{"$set":user_data.dict(by_alias=True)})
-	mongo.close()
+	await userCollection.update_one({"public_id": user_id},{"$set":user_data.dict(by_alias=True)})
 	return MyJSONResponse(status_code=status.HTTP_202_ACCEPTED, content={username:"updated", "status": status.HTTP_202_ACCEPTED})
