@@ -1,1 +1,1 @@
-web: uvicorn webapp:app --host 0.0.0.0 --port $PORT --workers $WORKERS
+web: gunicorn webapp:app --workers 8 --worker-class uvicorn.workers.UvicornWorker
